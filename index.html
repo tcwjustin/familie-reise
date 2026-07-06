@@ -1814,19 +1814,28 @@
   #logoutBtn{display:none}
   #membersBtn{display:none}
   #memberModal{position:fixed;inset:0;z-index:5200;display:none;align-items:center;justify-content:center;padding:22px;background:var(--overlay)}
-  #memberModal .mm-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:380px;padding:22px;max-height:80vh;overflow:auto}
-  #memberModal h3{font-family:var(--hand);font-size:22px;margin:0 0 4px;color:var(--ink)}
-  #memberModal .mm-sub{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-soft);margin-bottom:16px}
-  #memberModal .mm-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+  #memberModal .mm-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:18px;box-shadow:var(--shadow);width:100%;max-width:460px;padding:22px;max-height:84vh;overflow:auto}
+  #memberModal h3{font-family:var(--hand);font-size:24px;margin:0 0 4px;color:var(--ink)}
+  #memberModal .mm-sub{font-family:var(--body);font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6}
+  #memberModal .mm-profile{background:var(--accent-tint);border:1px solid rgba(142,94,68,.18);border-radius:16px;padding:14px;margin-bottom:16px}
+  #memberModal .mm-profile-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-weight:700;color:var(--terra-deep);font-size:14px}
+  #memberModal .mm-basic{display:grid;grid-template-columns:1fr;gap:8px}
+  #memberModal .mm-basic small{display:block;font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:2px;letter-spacing:.04em}
+  #memberModal .mm-basic b{display:block;font-size:14px;color:var(--ink);font-weight:700;word-break:break-word}
+  #memberModal .mm-section-title{font-size:13px;font-weight:700;color:var(--ink-soft);margin:10px 0 4px}
+  #memberModal .mm-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line-soft)}
   #memberModal .mm-row:first-of-type{border-top:none}
-  #memberModal .mm-em{flex:1;font-size:13.5px;word-break:break-all;font-family:var(--mono)}
-  #memberModal .mm-tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--terra);background:var(--accent-tint);border-radius:6px;padding:2px 7px}
+  #memberModal .mm-person{flex:1;min-width:0}
+  #memberModal .mm-name{display:block;font-size:14px;font-weight:700;color:var(--ink);line-height:1.35;word-break:break-word}
+  #memberModal .mm-em{display:block;font-size:12px;word-break:break-all;font-family:var(--mono);color:var(--ink-soft);margin-top:2px}
+  #memberModal .mm-tag{font-family:var(--body);font-size:11px;color:var(--terra);background:var(--accent-tint);border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:700}
+  #memberModal .mm-tag.admin{background:var(--terra);color:var(--on-accent)}
   #memberModal .mm-x{border:none;background:none;color:var(--rose);font-size:17px;cursor:pointer;padding:0 4px;opacity:.6}
   #memberModal .mm-x:hover{opacity:1}
-  #memberModal .mm-add{display:flex;gap:8px;margin-top:16px}
-  #memberModal .mm-add input{flex:1;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--surface-3);color:var(--ink)}
+  #memberModal .mm-add{display:grid;grid-template-columns:1fr;gap:8px;margin-top:16px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:14px;padding:12px}
+  #memberModal .mm-add input{width:100%;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--paper-2);color:var(--ink)}
   #memberModal .mm-add input:focus{outline:none;border-color:var(--terra)}
-  #memberModal .mm-add button{border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:0 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
+  #memberModal .mm-add button{border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
   #memberModal .mm-msg{font-size:12.5px;color:var(--ink-soft);min-height:16px;margin-top:8px}
   #memberModal .mm-close{margin-top:16px;width:100%;border:1px solid var(--kraft-deep);background:transparent;color:var(--ink-soft);border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--body)}
   #logoutBtn::before{content:"・";margin:0 6px;color:var(--ink-soft)}
@@ -1843,12 +1852,21 @@
 
 <div id="memberModal">
   <div class="mm-card">
-    <h3>成員</h3>
-    <div class="mm-sub">可以登入這本旅程的人 · 任何成員都能邀請</div>
+    <h3>成員管理</h3>
+    <div class="mm-sub">目前登入身分為系統管理員；成員基本資料只保留名字與信箱。</div>
+    <div class="mm-profile">
+      <div class="mm-profile-head"><span>我的基本資料</span><span class="mm-tag admin" id="mmMyRole">系統管理員</span></div>
+      <div class="mm-basic">
+        <div><small>名字</small><b id="mmMyName">－</b></div>
+        <div><small>信箱</small><b id="mmMyEmail">－</b></div>
+      </div>
+    </div>
+    <div class="mm-section-title">成員清單</div>
     <div id="mmList"></div>
     <div class="mm-add">
-      <input id="mmInput" type="email" placeholder="輸入對方的 Google email" autocomplete="off">
-      <button id="mmAdd">邀請</button>
+      <input id="mmNameInput" type="text" placeholder="名字" autocomplete="off">
+      <input id="mmInput" type="email" placeholder="信箱（Google email）" autocomplete="off">
+      <button id="mmAdd">新增成員</button>
     </div>
     <div class="mm-msg" id="mmMsg"></div>
     <button class="mm-close" id="mmClose">關閉</button>
@@ -1897,12 +1915,22 @@
   const gate = document.getElementById("loginGate");
   const gateMsg = document.getElementById("gateMsg");
   let currentEmail = "";
+  let currentName = "";
 
-  async function loadAllowed(){
+  function cleanEmail(e){ return String(e || "").trim().toLowerCase(); }
+  function nameFromEmail(e){ return cleanEmail(e).split("@")[0] || "未命名成員"; }
+  function escHtml(s){ return String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  async function loadMemberDoc(){
     try{
       const s = await getDoc(membersRef);
-      return s.exists() ? (s.data().allowed || []).map(e => String(e).toLowerCase()) : [];
-    }catch(e){ return []; }
+      return s.exists() ? s.data() : {};
+    }catch(e){ return {}; }
+  }
+
+  async function loadAllowed(){
+    const data = await loadMemberDoc();
+    return (data.allowed || []).map(cleanEmail).filter(Boolean);
   }
 
   document.getElementById("googleSignIn").onclick = () => {
@@ -1912,17 +1940,19 @@
 
   onAuthStateChanged(auth, async (user) => {
     if (!user){ gate.style.display = "flex"; return; }
-    currentEmail = (user.email || "").toLowerCase();
+    currentEmail = cleanEmail(user.email);
+    currentName = (user.displayName || nameFromEmail(currentEmail)).trim();
     const isOwner = currentEmail === ownerEmail;
-    let allowed = await loadAllowed();
+    let memberData = await loadMemberDoc();
+    let allowed = (memberData.allowed || []).map(cleanEmail).filter(Boolean);
 
-    // 起始擁有者：第一次登入自動建立/加入名單
-    if (isOwner && !allowed.includes(currentEmail)){
+    // 系統管理員：第一次登入自動建立/加入名單，並記錄基本資料（名字、信箱）
+    if (isOwner){
       try{
-        const s = await getDoc(membersRef);
-        if (s.exists()) await updateDoc(membersRef, { allowed: arrayUnion(currentEmail) });
-        else await setDoc(membersRef, { allowed: [currentEmail] });
-        allowed.push(currentEmail);
+        const names = Object.assign({}, memberData.names || {});
+        names[currentEmail] = currentName || nameFromEmail(currentEmail);
+        if (!allowed.includes(currentEmail)) allowed.push(currentEmail);
+        await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
       }catch(e){}
     }
 
@@ -1938,42 +1968,80 @@
   /* ---------- 成員管理 ---------- */
   const mModal = document.getElementById("memberModal");
   const mList  = document.getElementById("mmList");
+  const mNameInput = document.getElementById("mmNameInput");
   const mInput = document.getElementById("mmInput");
   const mMsg   = document.getElementById("mmMsg");
   const emailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
+  function setMyMemberCard(){
+    const role = currentEmail === ownerEmail ? "系統管理員" : "成員";
+    const name = currentName || nameFromEmail(currentEmail || ownerEmail);
+    document.getElementById("mmMyName").textContent = name;
+    document.getElementById("mmMyEmail").textContent = currentEmail || ownerEmail;
+    const roleEl = document.getElementById("mmMyRole");
+    roleEl.textContent = role;
+    roleEl.classList.toggle("admin", role === "系統管理員");
+  }
+
   async function renderMembers(){
     mMsg.textContent = "";
-    let allowed = await loadAllowed();
+    const data = await loadMemberDoc();
+    let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+    const names = Object.assign({}, data.names || {});
     if (!allowed.length && ownerEmail) allowed = [ownerEmail];
+    if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
     mList.innerHTML = allowed.map(function(em){
       const isOwn = em === currentEmail;
-      const isOwnerEm = em === ownerEmail;
-      const tag = isOwnerEm ? '<span class="mm-tag">擁有者</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '');
-      const x = (isOwnerEm || isOwn) ? '' : '<button class="mm-x" data-rm="'+em+'" title="移除">✕</button>';
-      return '<div class="mm-row"><span class="mm-em">'+em+'</span>'+tag+x+'</div>';
+      const isAdmin = em === ownerEmail;
+      const nm = names[em] || (isOwn ? currentName : "") || nameFromEmail(em);
+      const tag = isAdmin ? '<span class="mm-tag admin">系統管理員</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '<span class="mm-tag">成員</span>');
+      const x = (isAdmin || isOwn) ? '' : '<button class="mm-x" data-rm="'+escHtml(em)+'" title="移除">✕</button>';
+      return '<div class="mm-row"><span class="mm-person"><span class="mm-name">'+escHtml(nm)+'</span><span class="mm-em">'+escHtml(em)+'</span></span>'+tag+x+'</div>';
     }).join("");
     mList.querySelectorAll("[data-rm]").forEach(function(b){
       b.onclick = async function(){
-        try{ await updateDoc(membersRef, { allowed: arrayRemove(b.dataset.rm) }); renderMembers(); }
+        const rm = cleanEmail(b.dataset.rm);
+        try{
+          const data = await loadMemberDoc();
+          const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean).filter(e => e !== rm);
+          const names = Object.assign({}, data.names || {});
+          delete names[rm];
+          await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
+          renderMembers();
+        }
         catch(e){ mMsg.textContent = "移除失敗，請確認你有權限。"; }
       };
     });
   }
-  window.__openMembers = function(){ mModal.style.display = "flex"; renderMembers(); mInput.value = ""; };
+  window.__openMembers = function(){
+    mModal.style.display = "flex";
+    setMyMemberCard();
+    renderMembers();
+    mNameInput.value = "";
+    mInput.value = "";
+  };
   document.getElementById("mmClose").onclick = function(){ mModal.style.display = "none"; };
   mModal.onclick = function(e){ if (e.target === mModal) mModal.style.display = "none"; };
   document.getElementById("mmAdd").onclick = async function(){
-    const em = mInput.value.trim().toLowerCase();
-    if (!emailOk(em)){ mMsg.textContent = "email 格式怪怪的，再確認一下。"; return; }
-    mMsg.textContent = "邀請中…";
+    const nm = mNameInput.value.trim();
+    const em = cleanEmail(mInput.value);
+    if (!nm){ mMsg.textContent = "請先輸入名字。"; return; }
+    if (!emailOk(em)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
+    mMsg.textContent = "新增中…";
     try{
-      const s = await getDoc(membersRef);
-      if (s.exists()) await updateDoc(membersRef, { allowed: arrayUnion(em) });
-      else await setDoc(membersRef, { allowed: [ownerEmail, em] });
-      mInput.value = ""; mMsg.textContent = "已加入 " + em;
+      const data = await loadMemberDoc();
+      const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      if (!allowed.includes(em)) allowed.push(em);
+      const names = Object.assign({}, data.names || {});
+      if (ownerEmail && !names[ownerEmail]) names[ownerEmail] = currentName || nameFromEmail(ownerEmail);
+      names[em] = nm;
+      await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
+      mNameInput.value = "";
+      mInput.value = "";
+      mMsg.textContent = "已新增 " + nm;
       renderMembers();
-    }catch(e){ mMsg.textContent = "加入失敗，請確認你有權限。"; }
+    }catch(e){ mMsg.textContent = "新增失敗，請確認你有權限。"; }
   };
-  mInput.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmAdd").click(); });
+  [mNameInput, mInput].forEach(function(el){ el.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmAdd").click(); }); });
 </script>
