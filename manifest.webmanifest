@@ -1,0 +1,18 @@
+{
+  "name": "Our Journey ・ 旅程",
+  "short_name": "Journey",
+  "description": "把每一趟旅行的行程、回顧、足跡地圖與想去清單，都收進這裡。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbf7ef",
+  "theme_color": "#5f9bb0",
+  "lang": "zh-Hant-TW",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
