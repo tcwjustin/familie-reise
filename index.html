@@ -1822,6 +1822,12 @@
   #memberModal .mm-basic{display:grid;grid-template-columns:1fr;gap:8px}
   #memberModal .mm-basic small{display:block;font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:2px;letter-spacing:.04em}
   #memberModal .mm-basic b{display:block;font-size:14px;color:var(--ink);font-weight:700;word-break:break-word}
+  #memberModal .mm-basic input{width:100%;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--paper-2);color:var(--ink)}
+  #memberModal .mm-basic input:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px rgba(142,94,68,.14)}
+  #memberModal .mm-basic input:disabled{opacity:.72;background:var(--surface-3);cursor:not-allowed}
+  #memberModal .mm-note{font-size:12px;color:var(--ink-soft);line-height:1.55;margin-top:8px}
+  #memberModal .mm-profile-actions{margin-top:10px}
+  #memberModal .mm-profile-actions button{width:100%;border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
   #memberModal .mm-section-title{font-size:13px;font-weight:700;color:var(--ink-soft);margin:10px 0 4px}
   #memberModal .mm-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line-soft)}
   #memberModal .mm-row:first-of-type{border-top:none}
@@ -1853,13 +1859,15 @@
 <div id="memberModal">
   <div class="mm-card">
     <h3>成員管理</h3>
-    <div class="mm-sub">目前登入身分為系統管理員；成員基本資料只保留名字與信箱。</div>
+    <div class="mm-sub">系統管理員可新增或移除成員；成員可以自行編輯自己的名字與信箱。信箱調整後，需改用新信箱登入。</div>
     <div class="mm-profile">
       <div class="mm-profile-head"><span>我的基本資料</span><span class="mm-tag admin" id="mmMyRole">系統管理員</span></div>
       <div class="mm-basic">
-        <div><small>名字</small><b id="mmMyName">－</b></div>
-        <div><small>信箱</small><b id="mmMyEmail">－</b></div>
+        <div><small>名字</small><input id="mmMyNameInput" type="text" placeholder="名字" autocomplete="off"></div>
+        <div><small>信箱</small><input id="mmMyEmailInput" type="email" placeholder="信箱（Google email）" autocomplete="off"></div>
       </div>
+      <div class="mm-note" id="mmMyHint">信箱變更儲存後，系統會登出，請改用新信箱登入。</div>
+      <div class="mm-profile-actions"><button id="mmSaveSelf">儲存我的資料</button></div>
     </div>
     <div class="mm-section-title">成員清單</div>
     <div id="mmList"></div>
@@ -1890,7 +1898,7 @@
   };
   /* ⬇⬇⬇ ② 把這裡換成「你自己」的 Google email（全部小寫）⬇⬇⬇
      你是起始擁有者，第一次登入會自動把你加進成員名單；
-     其他人由你（或任何成員）在 App 裡的「成員」按鈕邀請。 */
+     其他人由系統管理員在 App 裡的「成員管理」邀請。 */
   const OWNER = "tcwjustin86@gmail.com";
   /* ⬆⬆⬆ 只需要改上面這兩塊，其他都不用動 ⬆⬆⬆ */
 
@@ -1920,6 +1928,7 @@
   function cleanEmail(e){ return String(e || "").trim().toLowerCase(); }
   function nameFromEmail(e){ return cleanEmail(e).split("@")[0] || "未命名成員"; }
   function escHtml(s){ return String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  function isSystemAdmin(){ return currentEmail === ownerEmail; }
 
   async function loadMemberDoc(){
     try{
@@ -1941,9 +1950,10 @@
   onAuthStateChanged(auth, async (user) => {
     if (!user){ gate.style.display = "flex"; return; }
     currentEmail = cleanEmail(user.email);
-    currentName = (user.displayName || nameFromEmail(currentEmail)).trim();
+    const fallbackName = (user.displayName || nameFromEmail(currentEmail)).trim();
     const isOwner = currentEmail === ownerEmail;
     let memberData = await loadMemberDoc();
+    currentName = ((memberData.names || {})[currentEmail] || fallbackName).trim();
     let allowed = (memberData.allowed || []).map(cleanEmail).filter(Boolean);
 
     // 系統管理員：第一次登入自動建立/加入名單，並記錄基本資料（名字、信箱）
@@ -1970,17 +1980,27 @@
   const mList  = document.getElementById("mmList");
   const mNameInput = document.getElementById("mmNameInput");
   const mInput = document.getElementById("mmInput");
+  const mMyNameInput = document.getElementById("mmMyNameInput");
+  const mMyEmailInput = document.getElementById("mmMyEmailInput");
+  const mMyHint = document.getElementById("mmMyHint");
+  const mAddBox = document.querySelector("#memberModal .mm-add");
   const mMsg   = document.getElementById("mmMsg");
   const emailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
   function setMyMemberCard(){
-    const role = currentEmail === ownerEmail ? "系統管理員" : "成員";
+    const admin = isSystemAdmin();
+    const role = admin ? "系統管理員" : "成員";
     const name = currentName || nameFromEmail(currentEmail || ownerEmail);
-    document.getElementById("mmMyName").textContent = name;
-    document.getElementById("mmMyEmail").textContent = currentEmail || ownerEmail;
+    mMyNameInput.value = name;
+    mMyEmailInput.value = currentEmail || ownerEmail;
+    mMyEmailInput.disabled = admin;
+    mMyHint.textContent = admin
+      ? "系統管理員信箱需與程式內 OWNER 設定一致；若要更換管理員信箱，請同步修改程式設定。"
+      : "信箱變更儲存後，系統會登出，請改用新信箱登入。";
+    if (mAddBox) mAddBox.style.display = admin ? "grid" : "none";
     const roleEl = document.getElementById("mmMyRole");
     roleEl.textContent = role;
-    roleEl.classList.toggle("admin", role === "系統管理員");
+    roleEl.classList.toggle("admin", admin);
   }
 
   async function renderMembers(){
@@ -1995,12 +2015,13 @@
       const isAdmin = em === ownerEmail;
       const nm = names[em] || (isOwn ? currentName : "") || nameFromEmail(em);
       const tag = isAdmin ? '<span class="mm-tag admin">系統管理員</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '<span class="mm-tag">成員</span>');
-      const x = (isAdmin || isOwn) ? '' : '<button class="mm-x" data-rm="'+escHtml(em)+'" title="移除">✕</button>';
+      const x = (isSystemAdmin() && !isAdmin) ? '<button class="mm-x" data-rm="'+escHtml(em)+'" title="移除">✕</button>' : '';
       return '<div class="mm-row"><span class="mm-person"><span class="mm-name">'+escHtml(nm)+'</span><span class="mm-em">'+escHtml(em)+'</span></span>'+tag+x+'</div>';
     }).join("");
     mList.querySelectorAll("[data-rm]").forEach(function(b){
       b.onclick = async function(){
         const rm = cleanEmail(b.dataset.rm);
+        if (!isSystemAdmin()){ mMsg.textContent = "只有系統管理員可以移除成員。"; return; }
         try{
           const data = await loadMemberDoc();
           const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean).filter(e => e !== rm);
@@ -2022,9 +2043,51 @@
   };
   document.getElementById("mmClose").onclick = function(){ mModal.style.display = "none"; };
   mModal.onclick = function(e){ if (e.target === mModal) mModal.style.display = "none"; };
+
+  document.getElementById("mmSaveSelf").onclick = async function(){
+    const oldEmail = currentEmail || ownerEmail;
+    const newName = mMyNameInput.value.trim();
+    const newEmail = cleanEmail(mMyEmailInput.value);
+    if (!newName){ mMsg.textContent = "請先輸入名字。"; return; }
+    if (!emailOk(newEmail)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
+    if (oldEmail === ownerEmail && newEmail !== oldEmail){
+      mMsg.textContent = "系統管理員信箱需同步修改程式內 OWNER 設定，這裡先不開放直接更換。";
+      mMyEmailInput.value = oldEmail;
+      return;
+    }
+    mMsg.textContent = "儲存中…";
+    try{
+      const data = await loadMemberDoc();
+      let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      if (newEmail !== oldEmail && allowed.includes(newEmail)){
+        mMsg.textContent = "這個信箱已經在成員清單內。";
+        return;
+      }
+      allowed = allowed.map(e => e === oldEmail ? newEmail : e);
+      if (!allowed.includes(newEmail)) allowed.push(newEmail);
+      const names = Object.assign({}, data.names || {});
+      if (newEmail !== oldEmail) delete names[oldEmail];
+      names[newEmail] = newName;
+      await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
+      currentName = newName;
+      if (newEmail !== oldEmail){
+        mMsg.textContent = "信箱已更新，請用新信箱重新登入。";
+        setTimeout(function(){ signOut(auth); }, 900);
+      }else{
+        mMsg.textContent = "我的基本資料已更新。";
+        setMyMemberCard();
+        renderMembers();
+      }
+    }catch(e){
+      mMsg.textContent = "儲存失敗，請確認你有權限。";
+    }
+  };
+
   document.getElementById("mmAdd").onclick = async function(){
     const nm = mNameInput.value.trim();
     const em = cleanEmail(mInput.value);
+    if (!isSystemAdmin()){ mMsg.textContent = "只有系統管理員可以新增成員。"; return; }
     if (!nm){ mMsg.textContent = "請先輸入名字。"; return; }
     if (!emailOk(em)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
     mMsg.textContent = "新增中…";
@@ -2044,4 +2107,5 @@
     }catch(e){ mMsg.textContent = "新增失敗，請確認你有權限。"; }
   };
   [mNameInput, mInput].forEach(function(el){ el.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmAdd").click(); }); });
+  [mMyNameInput, mMyEmailInput].forEach(function(el){ el.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmSaveSelf").click(); }); });
 </script>
