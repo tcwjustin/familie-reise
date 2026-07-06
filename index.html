@@ -1907,7 +1907,7 @@
   const db = getFirestore(app);
   const COL = "familydata";
   const ownerEmail = OWNER.trim().toLowerCase();
-  const membersRef = doc(db, COL, "__members__");
+  const membersRef = doc(db, COL, "members_meta");   // 註：不可用前後雙底線的 id，那是 Firestore 保留字
 
   window.cloudStore = {
     async get(k){ const s = await getDoc(doc(db, COL, k)); return s.exists() ? s.data().value : null; },
