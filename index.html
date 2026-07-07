@@ -1,5 +1,4 @@
-
-  <meta charset="utf-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Our Journey ・ 旅程</title>
 
@@ -401,6 +400,7 @@
   <button class="navi" data-tab="map"><span class="ic">🗺️</span>足跡地圖</button>
   <button class="navi" data-tab="wish"><span class="ic">⭐</span>想去清單</button>
   <div class="drawer-sep"></div>
+  <button class="navi" id="naviPush"><span class="ic">🔔</span>開啟通知</button>
   <button class="navi" id="naviMembers"><span class="ic">👥</span>成員管理</button>
   <button class="navi" id="naviTrash"><span class="ic">🗑️</span>回收桶<span id="trashBadge"></span></button>
   <button class="navi out" id="naviLogout"><span class="ic">↩</span>登出</button>
@@ -541,7 +541,8 @@
     <label>從想去清單挑（可選）</label>
     <select id="stopWish"></select>
     <label>地點 / 行程</label>
-    <input type="text" id="stopName" placeholder="例如：清水寺">
+    <input type="text" id="stopName" placeholder="打字搜尋地點，例如：清水寺 / Helsinki" autocomplete="off">
+    <div class="geo-results" id="stopResults"></div>
     <label>國家 / 城市・鄉鎮（可選）</label>
     <div style="display:flex;gap:8px">
       <input type="text" id="stopCountry" placeholder="國家" style="flex:1">
@@ -742,6 +743,7 @@
       await store.set("footprints", JSON.stringify(footprints));
     }
     renderAll();
+    setupLiveSync();
   }
 
   /* ---------- live sync: 回到 App / 切回分頁時，自動重抓最新資料 ---------- */
@@ -781,6 +783,25 @@
   document.addEventListener("visibilitychange", function(){ if(document.visibilityState==="visible") refreshIfIdle(); });
   window.addEventListener("focus", refreshIfIdle);
   window.addEventListener("online", refreshIfIdle);
+
+  /* ---------- 即時同步：雲端一有變動就自動重抓（trips/清單/回憶/回收桶） ---------- */
+  var _liveSyncSet=false, _syncTimer=null;
+  function onRemoteChange(){
+    clearTimeout(_syncTimer);
+    _syncTimer=setTimeout(function run(){
+      if(!__started){ _syncTimer=setTimeout(run,800); return; }
+      if(document.querySelector(".overlay.show, .light.show") || (document.activeElement && document.activeElement.isContentEditable)){ _syncTimer=setTimeout(run,1000); return; }
+      refreshIfIdle();
+    }, 500);
+  }
+  function setupLiveSync(){
+    if(_liveSyncSet || !window.cloudStore || !window.cloudStore.subscribe) return;
+    _liveSyncSet=true;
+    var last={};
+    ["trips","wishlist","footprints","trash"].forEach(function(k){
+      window.cloudStore.subscribe(k, function(val){ if(last[k]===val) return; last[k]=val; onRemoteChange(); });
+    });
+  }
 
   /* ---------- render ---------- */
   function renderAll(){ renderStats(); renderTrips(); renderTimeline(); renderWishlist(); refreshMap(); }
@@ -1534,6 +1555,7 @@
     $("stopWish").innerHTML=opts; $("stopWish").value="";
     $("stopName").value=ex?(ex.name||""):""; $("stopCountry").value=ex?(ex.country||""):""; $("stopRegion").value=ex?(ex.region||""):""; $("stopNote").value=ex?(ex.note||""):"";
     $("stopSave").textContent = ex ? "儲存修改" : "加進行程";
+    if($("stopResults")) $("stopResults").innerHTML=""; initStopAutocomplete();
     $("stopOverlay").classList.add("show");
   }
   $("stopWish").addEventListener("change",function(){
@@ -1541,6 +1563,48 @@
     if(w){ $("stopName").value=w.title||""; $("stopCountry").value=w.country||""; $("stopRegion").value=w.region||""; if(w.note&&!$("stopNote").value)$("stopNote").value=w.note;
       stopPickCoords=(w.lat!=null)?{lat:w.lat,lng:w.lng}:null; stopPickPlaceId=w.placeId||""; }
   });
+
+  /* ---------- 加景點：Google 地點搜尋（跟想去清單同一套） ---------- */
+  var sReadySvc=null, sPlacesSvc=null, stopSearchTimer=null;
+  function initStopAutocomplete(){
+    if(!window.gmReady || !window.google || !google.maps.places) return;
+    if(!sReadySvc){ try{ sReadySvc=new google.maps.places.AutocompleteService(); sPlacesSvc=new google.maps.places.PlacesService(document.createElement("div")); }catch(e){ } }
+  }
+  function onStopType(){
+    var q=$("stopName").value.trim();
+    clearTimeout(stopSearchTimer);
+    if(!sReadySvc) initStopAutocomplete();
+    if(!sReadySvc || q.length<2){ if($("stopResults")) $("stopResults").innerHTML=""; return; }
+    stopSearchTimer=setTimeout(function(){
+      sReadySvc.getPlacePredictions({input:q, language:"zh-TW"}, function(preds,status){
+        if(status!==google.maps.places.PlacesServiceStatus.OK || !preds || !preds.length){ $("stopResults").innerHTML=""; return; }
+        $("stopResults").innerHTML=preds.slice(0,5).map(function(p){
+          var main=(p.structured_formatting&&p.structured_formatting.main_text)||p.description;
+          return '<div class="geo-item" data-pid="'+p.place_id+'"><b>'+esc(main)+'</b><small>'+esc(p.description)+'</small></div>';
+        }).join("");
+        $("stopResults").querySelectorAll("[data-pid]").forEach(function(it){ it.addEventListener("click",function(){ pickStopPlace(it.getAttribute("data-pid")); }); });
+      });
+    },350);
+  }
+  function pickStopPlace(pid){
+    if(!sPlacesSvc) return;
+    $("stopResults").innerHTML='<div class="geo-msg">讀取地點中…</div>';
+    sPlacesSvc.getDetails({placeId:pid, fields:["name","geometry","address_components"]}, function(place,status){
+      if(status!==google.maps.places.PlacesServiceStatus.OK || !place || !place.geometry){ $("stopResults").innerHTML='<div class="geo-msg">讀取失敗，可手動輸入 🙏</div>'; return; }
+      var country="", region="";
+      (place.address_components||[]).forEach(function(c){
+        if(c.types.indexOf("country")>=0) country=c.long_name;
+        if(!region && (c.types.indexOf("locality")>=0 || c.types.indexOf("administrative_area_level_1")>=0)) region=c.long_name;
+      });
+      $("stopName").value=place.name||"";
+      if(country) $("stopCountry").value=country;
+      if(region) $("stopRegion").value=region;
+      stopPickCoords={lat:place.geometry.location.lat(), lng:place.geometry.location.lng()};
+      stopPickPlaceId=pid;
+      $("stopResults").innerHTML='<div class="geo-msg">✓ 已帶入座標：'+esc(place.name||"")+'</div>';
+    });
+  }
+  if($("stopName")) $("stopName").addEventListener("input", onStopType);
   $("etClear").addEventListener("click",function(){ $("etStart").value=""; $("etEnd").value=""; });
   $("etSave").addEventListener("click",async function(){
     var t=curTrip(); if(!t||!editingTimeId){ $("timeOverlay").classList.remove("show"); return; }
@@ -1623,6 +1687,7 @@
   (function(){
     var b=$("burger"); if(b)b.addEventListener("click",openDrawer);
     var sc=$("navScrim"); if(sc)sc.addEventListener("click",closeDrawer);
+    var pu=$("naviPush"); if(pu)pu.addEventListener("click",function(){ closeDrawer(); window.enablePush&&window.enablePush(); });
     var m=$("naviMembers"); if(m)m.addEventListener("click",function(){ closeDrawer(); window.__openMembers&&window.__openMembers(); });
     var tr=$("naviTrash"); if(tr)tr.addEventListener("click",function(){ closeDrawer(); window.__openTrash&&window.__openTrash(); });
     var lo=$("naviLogout"); if(lo)lo.addEventListener("click",function(){ window.fbAuth&&window.fbAuth.signOut(); });
@@ -1860,7 +1925,7 @@
 <div id="memberModal">
   <div class="mm-card">
     <h3>成員管理</h3>
-    <div class="mm-sub">所有成員都可以邀請新成員；只有系統管理員可以移除成員。成員可以自行編輯自己的名字與信箱，信箱調整後需改用新信箱登入。</div>
+    <div class="mm-sub">系統管理員可新增或移除成員；成員可以自行編輯自己的名字與信箱。信箱調整後，需改用新信箱登入。</div>
     <div class="mm-profile">
       <div class="mm-profile-head"><span>我的基本資料</span><span class="mm-tag admin" id="mmMyRole">系統管理員</span></div>
       <div class="mm-basic">
@@ -1875,7 +1940,7 @@
     <div class="mm-add">
       <input id="mmNameInput" type="text" placeholder="名字" autocomplete="off">
       <input id="mmInput" type="email" placeholder="信箱（Google email）" autocomplete="off">
-      <button id="mmAdd">邀請成員</button>
+      <button id="mmAdd">新增成員</button>
     </div>
     <div class="mm-msg" id="mmMsg"></div>
     <button class="mm-close" id="mmClose">關閉</button>
@@ -1885,7 +1950,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, arrayUnion, arrayRemove, onSnapshot } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-messaging.js";
 
   /* ⬇⬇⬇ ① Firebase 設定：貼上你自己專案的設定 ⬇⬇⬇
      （Firebase 主控台 → 專案設定 → 你的應用程式 → SDK 設定與配置） */
@@ -1899,7 +1965,7 @@
   };
   /* ⬇⬇⬇ ② 把這裡換成「你自己」的 Google email（全部小寫）⬇⬇⬇
      你是起始擁有者，第一次登入會自動把你加進成員名單；
-     其他人可由任一成員在 App 裡的「成員管理」邀請。 */
+     其他人由系統管理員在 App 裡的「成員管理」邀請。 */
   const OWNER = "tcwjustin86@gmail.com";
   /* ⬆⬆⬆ 只需要改上面這兩塊，其他都不用動 ⬆⬆⬆ */
 
@@ -1908,19 +1974,56 @@
   const db = getFirestore(app);
   const COL = "familydata";
   const ownerEmail = OWNER.trim().toLowerCase();
-  let adminEmail = ownerEmail;
-  const membersRef = doc(db, COL, "members_meta");   // 註：不可用前後雙底線的 id，那是 Firestore 保留字
+  const membersRef = doc(db, COL, "members_meta");   // 註：前後雙底線是 Firestore 保留字，不能用
 
   window.cloudStore = {
     async get(k){ const s = await getDoc(doc(db, COL, k)); return s.exists() ? s.data().value : null; },
     async set(k, v){ await setDoc(doc(db, COL, k), { key: k, value: v }); return { key: k, value: v }; },
     async del(k){ await deleteDoc(doc(db, COL, k)); },
-    async list(prefix){ const qy = query(collection(db, COL), where("key", ">=", prefix), where("key", "<", prefix + "\uf8ff")); const snap = await getDocs(qy); return snap.docs.map(d => d.id); }
+    async list(prefix){ const qy = query(collection(db, COL), where("key", ">=", prefix), where("key", "<", prefix + "\uf8ff")); const snap = await getDocs(qy); return snap.docs.map(d => d.id); },
+    subscribe(k, cb){ try{ return onSnapshot(doc(db, COL, k), function(snap){ if(snap.metadata && snap.metadata.hasPendingWrites) return; cb(snap.exists() ? snap.data().value : null); }, function(){}); }catch(e){ return function(){}; } }
   };
   window.fbAuth = {
     signIn(){ return signInWithPopup(auth, new GoogleAuthProvider()); },
     signOut(){ return signOut(auth); }
   };
+
+  /* ---------- 推播通知（FCM） ---------- */
+  /* ⬇⬇⬇ 把這串換成你的 VAPID 金鑰（Firebase → 專案設定 → Cloud Messaging → Web Push certificates → 那串以 B 開頭）⬇⬇⬇ */
+  const VAPID_KEY = "BCDdMnS9mLz_NKE2-hI6dPK23312DpHItlAq8QuHGpGO5S7n-qSNeKEbkadk4VlnAx3TtxjaZ1G8kzVb352lHuU";
+  let messaging = null;
+  try { messaging = getMessaging(app); } catch(e){ }
+
+  window.enablePush = async function(){
+    try{
+      if(!("Notification" in window) || !messaging){ alert("這個裝置/瀏覽器不支援網頁通知。\niPhone 請先把網站『加到主畫面』開啟後再試。"); return; }
+      const perm = await Notification.requestPermission();
+      if(perm !== "granted"){ alert("你沒有允許通知。可到裝置/瀏覽器設定手動開啟後再試。"); return; }
+      const reg = await navigator.serviceWorker.register("firebase-messaging-sw.js");
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      if(!token){ alert("拿不到推播 token，請再試一次。"); return; }
+      const email = ((auth.currentUser && auth.currentUser.email) || "").toLowerCase();
+      try{
+        const key = "pushtoken:" + email;
+        const raw = await window.cloudStore.get(key);
+        const obj = raw ? JSON.parse(raw) : { key:key, email:email, tokens:[] };
+        if(!obj.tokens) obj.tokens = [];
+        if(obj.tokens.indexOf(token) < 0) obj.tokens.push(token);
+        obj.email = email;
+        await window.cloudStore.set(key, JSON.stringify(obj));
+      }catch(e){ console.log("save token error", e); }
+      console.log("✅ FCM token:", token);
+      window.__lastPushToken = token;
+      prompt("通知已開啟 ✅\n\n這是這台裝置的推播 token（測試用，長按全選複製）：", token);
+    }catch(e){ console.log("push error", e); alert("開啟通知失敗：" + ((e && e.message) || e)); }
+  };
+
+  try{
+    if(messaging) onMessage(messaging, function(payload){
+      const n = (payload && payload.notification) || {};
+      try{ new Notification(n.title || "提醒", { body: n.body || "", icon: "icon-192.png" }); }catch(e){}
+    });
+  }catch(e){}
 
   const gate = document.getElementById("loginGate");
   const gateMsg = document.getElementById("gateMsg");
@@ -1930,7 +2033,7 @@
   function cleanEmail(e){ return String(e || "").trim().toLowerCase(); }
   function nameFromEmail(e){ return cleanEmail(e).split("@")[0] || "未命名成員"; }
   function escHtml(s){ return String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-  function isSystemAdmin(){ return currentEmail === adminEmail; }
+  function isSystemAdmin(){ return currentEmail === ownerEmail; }
 
   async function loadMemberDoc(){
     try{
@@ -1953,9 +2056,8 @@
     if (!user){ gate.style.display = "flex"; return; }
     currentEmail = cleanEmail(user.email);
     const fallbackName = (user.displayName || nameFromEmail(currentEmail)).trim();
+    const isOwner = currentEmail === ownerEmail;
     let memberData = await loadMemberDoc();
-    adminEmail = cleanEmail(memberData.adminEmail || ownerEmail);
-    const isOwner = currentEmail === adminEmail || (!memberData.adminEmail && currentEmail === ownerEmail);
     currentName = ((memberData.names || {})[currentEmail] || fallbackName).trim();
     let allowed = (memberData.allowed || []).map(cleanEmail).filter(Boolean);
 
@@ -1965,8 +2067,7 @@
         const names = Object.assign({}, memberData.names || {});
         names[currentEmail] = currentName || nameFromEmail(currentEmail);
         if (!allowed.includes(currentEmail)) allowed.push(currentEmail);
-        adminEmail = currentEmail;
-        await setDoc(membersRef, { allowed: allowed, names: names, adminEmail: adminEmail }, { merge: true });
+        await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
       }catch(e){}
     }
 
@@ -1974,7 +2075,7 @@
       gate.style.display = "none";
       window.__startApp && window.__startApp();
     } else {
-      gateMsg.textContent = "這個帳號還沒被邀請，請聯絡已加入的成員把你加進成員清單。";
+      gateMsg.textContent = "這個帳號還沒被邀請，請聯絡家人把你加進成員。";
       signOut(auth);
     }
   });
@@ -1997,11 +2098,11 @@
     const name = currentName || nameFromEmail(currentEmail || ownerEmail);
     mMyNameInput.value = name;
     mMyEmailInput.value = currentEmail || ownerEmail;
-    mMyEmailInput.disabled = false;
+    mMyEmailInput.disabled = admin;
     mMyHint.textContent = admin
-      ? "你是系統管理員；信箱變更儲存後，會一併更新管理員信箱，並需改用新信箱登入。"
+      ? "系統管理員信箱需與程式內 OWNER 設定一致；若要更換管理員信箱，請同步修改程式設定。"
       : "信箱變更儲存後，系統會登出，請改用新信箱登入。";
-    if (mAddBox) mAddBox.style.display = "grid";
+    if (mAddBox) mAddBox.style.display = "grid";   // 乙：所有成員都能邀請
     const roleEl = document.getElementById("mmMyRole");
     roleEl.textContent = role;
     roleEl.classList.toggle("admin", admin);
@@ -2012,11 +2113,11 @@
     const data = await loadMemberDoc();
     let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
     const names = Object.assign({}, data.names || {});
-    if (!allowed.length && adminEmail) allowed = [adminEmail];
-    if (adminEmail && !allowed.includes(adminEmail)) allowed.unshift(adminEmail);
+    if (!allowed.length && ownerEmail) allowed = [ownerEmail];
+    if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
     mList.innerHTML = allowed.map(function(em){
       const isOwn = em === currentEmail;
-      const isAdmin = em === adminEmail;
+      const isAdmin = em === ownerEmail;
       const nm = names[em] || (isOwn ? currentName : "") || nameFromEmail(em);
       const tag = isAdmin ? '<span class="mm-tag admin">系統管理員</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '<span class="mm-tag">成員</span>');
       const x = (isSystemAdmin() && !isAdmin) ? '<button class="mm-x" data-rm="'+escHtml(em)+'" title="移除">✕</button>' : '';
@@ -2049,16 +2150,21 @@
   mModal.onclick = function(e){ if (e.target === mModal) mModal.style.display = "none"; };
 
   document.getElementById("mmSaveSelf").onclick = async function(){
-    const oldEmail = currentEmail || adminEmail;
+    const oldEmail = currentEmail || ownerEmail;
     const newName = mMyNameInput.value.trim();
     const newEmail = cleanEmail(mMyEmailInput.value);
     if (!newName){ mMsg.textContent = "請先輸入名字。"; return; }
     if (!emailOk(newEmail)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
+    if (oldEmail === ownerEmail && newEmail !== oldEmail){
+      mMsg.textContent = "系統管理員信箱需同步修改程式內 OWNER 設定，這裡先不開放直接更換。";
+      mMyEmailInput.value = oldEmail;
+      return;
+    }
     mMsg.textContent = "儲存中…";
     try{
       const data = await loadMemberDoc();
       let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
-      if (adminEmail && !allowed.includes(adminEmail)) allowed.unshift(adminEmail);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
       if (newEmail !== oldEmail && allowed.includes(newEmail)){
         mMsg.textContent = "這個信箱已經在成員清單內。";
         return;
@@ -2068,12 +2174,7 @@
       const names = Object.assign({}, data.names || {});
       if (newEmail !== oldEmail) delete names[oldEmail];
       names[newEmail] = newName;
-      const updatePayload = { allowed: allowed, names: names };
-      if (oldEmail === adminEmail){
-        adminEmail = newEmail;
-        updatePayload.adminEmail = newEmail;
-      }
-      await setDoc(membersRef, updatePayload, { merge: true });
+      await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
       currentName = newName;
       if (newEmail !== oldEmail){
         mMsg.textContent = "信箱已更新，請用新信箱重新登入。";
@@ -2097,15 +2198,15 @@
     try{
       const data = await loadMemberDoc();
       const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
-      if (adminEmail && !allowed.includes(adminEmail)) allowed.unshift(adminEmail);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
       if (!allowed.includes(em)) allowed.push(em);
       const names = Object.assign({}, data.names || {});
-      if (adminEmail && !names[adminEmail]) names[adminEmail] = nameFromEmail(adminEmail);
+      if (ownerEmail && !names[ownerEmail]) names[ownerEmail] = currentName || nameFromEmail(ownerEmail);
       names[em] = nm;
       await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
       mNameInput.value = "";
       mInput.value = "";
-      mMsg.textContent = "已邀請 " + nm;
+      mMsg.textContent = "已新增 " + nm;
       renderMembers();
     }catch(e){ mMsg.textContent = "新增失敗，請確認你有權限。"; }
   };
