@@ -1061,7 +1061,7 @@
           '</div>';
         });
       } else { html+='<div style="color:#9A9284;font-size:13px">（這天還沒排景點）</div>'; }
-      if(d.lodging&&d.lodging.name){ html+='<div style="margin-top:7px;font-size:13px;color:#8a6d2e;background:#f9f0db;border-radius:8px;padding:6px 11px">🏨 '+esc(d.lodging.name)+(d.lodging.code?'　訂單 '+esc(d.lodging.code):'')+'</div>'; }
+      if(d.lodging&&d.lodging.name){ html+='<div style="margin-top:7px;font-size:13px;color:#8a6d2e;background:#f9f0db;border-radius:8px;padding:6px 11px">🏡 '+esc(d.lodging.name)+(d.lodging.code?'　訂單 '+esc(d.lodging.code):'')+'</div>'; }
       html+='</div>';
     });
     html+='<div style="text-align:center;font-size:12px;color:#9A9284;margin-top:10px">— Our Journey ・ 把每一趟旅行，都收進這裡 ✈️ —</div></div>';
@@ -1140,7 +1140,7 @@
         '<div class="day-stops" data-daystops="'+d.n+'">'+rows+'</div>'+
         '<button class="add-link" data-addstop="'+d.n+'">＋ 加景點</button>'+
         ((d.lodging&&d.lodging.name) ?
-          '<div class="lodge-bar" data-lodge="'+d.n+'">🏨 <b>'+esc(d.lodging.name)+'</b>'+
+          '<div class="lodge-bar" data-lodge="'+d.n+'">🏡 <b>'+esc(d.lodging.name)+'</b>'+
             ((d.lodging.checkin||d.lodging.checkout)?'<span class="lg-sub">'+esc([fmtDate(d.lodging.checkin),fmtDate(d.lodging.checkout)].filter(Boolean).join(" → "))+'</span>':'')+
             (d.lodging.code?'<span class="lg-sub">訂單 '+esc(d.lodging.code)+'</span>':'')+
           '</div>'
