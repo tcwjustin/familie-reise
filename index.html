@@ -209,6 +209,8 @@
   .complete-trip{background:var(--terra);color:var(--on-accent);border:none;border-radius:14px;padding:12px 24px;font-family:var(--body);font-weight:700;font-size:15px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s}
   .complete-trip:hover{transform:translateY(-2px)}
   .complete-trip.is-done{background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--kraft-deep);box-shadow:none}
+  .uncomplete-trip{background:var(--surface-3);color:var(--ink-soft);border:1px solid var(--kraft-deep);border-radius:14px;padding:12px 20px;font-family:var(--body);font-weight:600;font-size:14px;cursor:pointer}
+  .uncomplete-trip:hover{color:var(--ink)}
   .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:var(--terra-deep);color:var(--on-accent);padding:12px 20px;border-radius:16px;font-weight:600;font-size:14px;z-index:1400;box-shadow:0 10px 26px rgba(60,50,35,.35);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .pp-btn{border:none;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;font-family:var(--body)}
@@ -390,6 +392,56 @@
   .pass .pass-notch.pn-t{top:-8px}
   .pass .pass-notch.pn-b{bottom:-8px}
   @media(max-width:400px){ .pass .pass-stub{width:88px} .pass .pass-notch{right:80px} }
+
+  /* ---------- 提醒視窗 ---------- */
+  #reminderModal{position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;padding:20px;background:var(--overlay)}
+  #reminderModal .rem-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:400px;max-height:86vh;overflow:auto;padding:20px}
+  #reminderModal h3{font-family:var(--hand);font-size:22px;margin:0 0 4px;color:var(--ink)}
+  .rem-cap{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:14px}
+  .rem-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--accent-tint),var(--surface-3));border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .rem-banner .rb-ic{width:40px;height:40px;border-radius:11px;background:var(--terra);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .rem-banner .rb-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--terra-deep)}
+  .rem-banner .rb-n{font-family:var(--hand);font-weight:700;font-size:15px;margin-top:1px}
+  .rem-banner .rb-w{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+  .rem-lh,.rem-lh2{font-family:var(--hand);font-weight:700;font-size:15px;margin:10px 0 8px}
+  .rem-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+  .rem-row:first-child{border-top:none}
+  .rem-chk{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--kraft-deep);background:var(--paper);cursor:pointer;flex-shrink:0;color:transparent;font-size:13px}
+  .rem-row.done .rem-chk{background:var(--sage);border-color:var(--sage);color:#fff}
+  .rem-ic{width:34px;height:34px;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .rem-mid{flex:1;min-width:0}
+  .rem-ti{font-size:14px;font-weight:500}
+  .rem-row.done .rem-ti{text-decoration:line-through;color:var(--ink-3)}
+  .rem-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .rem-when{font-family:var(--mono);font-size:11.5px;font-weight:700;flex-shrink:0;text-align:right}
+  .rem-when.soon{color:var(--terra)} .rem-when.today{color:var(--rose)} .rem-when.past{color:var(--ink-3)}
+  .rem-x{border:none;background:none;color:var(--ink-3);font-size:14px;cursor:pointer;opacity:.55}
+  .rem-empty{color:var(--ink-3);font-size:13px;text-align:center;padding:14px}
+  .rem-form{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:6px}
+  .rem-form input{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--surface-3);border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .rem-form input:focus{outline:none;border-color:var(--terra)}
+  .rem-row2{display:flex;gap:8px}.rem-row2 input{flex:1;min-width:0}
+  .rem-cats{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .rem-cat{font-size:12.5px;padding:7px 11px;border-radius:999px;border:1px solid var(--kraft-deep);background:var(--paper);cursor:pointer;color:var(--ink-soft)}
+  .rem-cat.on{background:var(--accent-tint);border-color:var(--terra);color:var(--terra-deep);font-weight:500}
+  #remAdd{width:100%;margin-top:14px;border:none;border-radius:11px;background:var(--terra);color:var(--on-accent);font-family:var(--body);font-weight:700;font-size:15px;padding:12px;cursor:pointer}
+  .rem-msg{font-size:12.5px;color:var(--ink-soft);min-height:16px;margin-top:8px}
+  .rem-close{margin-top:14px;width:100%;border:1px solid var(--kraft-deep);background:transparent;color:var(--ink-soft);border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--body)}
+
+  .rem-tz{background:var(--surface-3);border:1px solid var(--line-soft);border-radius:11px;padding:10px 12px;margin-bottom:14px}
+  .rem-tz small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:6px}
+  .rem-tz select{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:9px;padding:9px 10px}
+  .rem-tz select:focus{outline:none;border-color:var(--terra)}
+
+  .trip-notes{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;margin:8px 0 4px;overflow:hidden}
+  .trip-notes .tn-head{padding:12px 16px;font-family:var(--hand);font-weight:700;font-size:15px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .trip-notes .tn-arrow{font-size:11px;color:var(--ink-soft);transition:transform .2s}
+  .trip-notes.open .tn-arrow{transform:rotate(180deg)}
+  .trip-notes .tn-body{display:none;padding:2px 16px 14px;font-size:13.5px;line-height:1.7;color:var(--ink-soft);white-space:pre-wrap;outline:none}
+  .trip-notes.open .tn-body{display:block}
+  .trip-notes .tn-body:empty::before{content:"點這裡輸入注意事項／攻略…";color:var(--ink-3)}
+  .trip-notes .tn-body:focus{color:var(--ink)}
+  .trip-notes.has .tn-head{color:var(--terra-deep)}
 </style>
 
 <div class="scrim" id="navScrim"></div>
@@ -401,6 +453,7 @@
   <button class="navi" data-tab="wish"><span class="ic">⭐</span>想去清單</button>
   <div class="drawer-sep"></div>
   <button class="navi" id="naviPush"><span class="ic">🔔</span>開啟通知</button>
+  <button class="navi" id="naviReminders"><span class="ic">⏰</span>提醒</button>
   <button class="navi" id="naviMembers"><span class="ic">👥</span>成員管理</button>
   <button class="navi" id="naviTrash"><span class="ic">🗑️</span>回收桶<span id="trashBadge"></span></button>
   <button class="navi out" id="naviLogout"><span class="ic">↩</span>登出</button>
@@ -1043,7 +1096,13 @@
       '<div class="trip-tools">'+
         '<button class="export-trip" data-export="'+t.id+'">📤 匯出行程圖片</button>'+
         '<button class="complete-trip'+(t.done?' is-done':'')+'" data-done="'+t.id+'">'+(t.done?'✓ 已完成這趟（再點同步新景點）':'✓ 我們完成這趟旅行了，加進足跡')+'</button>'+
+        (t.done?'<button class="uncomplete-trip" data-undone="'+t.id+'">↩ 取消完成（還原成進行中）</button>':'')+
         '<button class="del-trip" data-deltrip="'+t.id+'">🗑 刪除這個旅程</button>'+
+      '</div>';
+
+    detail += '<div class="trip-notes'+((t.notes&&String(t.notes).trim())?' has':'')+'" data-tnwrap="1">'+
+        '<div class="tn-head" data-tntoggle="1">📌 注意事項／攻略<span class="tn-arrow">▾</span></div>'+
+        '<div class="tn-body" data-tnedit="1" contenteditable="true" spellcheck="false">'+((t.notes&&String(t.notes).trim())?esc(t.notes):'')+'</div>'+
       '</div>';
 
     detail += days.map(function(d){
@@ -1096,6 +1155,14 @@
     var nm=el.querySelector('[data-ename]');
     nm.addEventListener("blur",function(){ t.name=nm.textContent.trim()||"未命名旅程"; saveTrips(); renderTrips(); });
     nm.addEventListener("keydown",function(e){ if(e.key==="Enter"){e.preventDefault();nm.blur();} });
+    // trip notes（注意事項／攻略）
+    var tnwrap=el.querySelector('[data-tnwrap]');
+    if(tnwrap){
+      var tnhead=tnwrap.querySelector('[data-tntoggle]');
+      if(tnhead) tnhead.addEventListener('click',function(){ tnwrap.classList.toggle('open'); });
+      var tnbody=tnwrap.querySelector('[data-tnedit]');
+      if(tnbody) tnbody.addEventListener('blur',function(){ t.notes=tnbody.textContent.replace(/\u00a0/g,' ').replace(/[ \t]+\n/g,'\n').trim(); saveTrips(); });
+    }
     // day theme edit
     el.querySelectorAll('[data-eday]').forEach(function(th){
       th.addEventListener("blur",function(){ var n=+th.getAttribute("data-eday"); var dd=t.days.find(function(x){return x.n===n;}); if(dd){ var v=th.textContent.trim(); dd.theme=(v==="（點這裡寫今天主題）")?"":v; saveTrips(); } });
@@ -1110,10 +1177,28 @@
     // add stop / add day
     el.querySelectorAll('[data-done]').forEach(function(b){
       b.addEventListener("click",function(){
-        completeTrip(t).then(function(added){
-          if(added>0){ toast("已加入 "+added+" 個足跡 👣"); var mt=document.querySelector('[data-tab="map"]'); if(mt) mt.click(); }
-          else { toast("沒有新的足跡可加入（可能已加過，或景點沒有座標）"); }
-        });
+        if(t.done){
+          completeTrip(t).then(function(added){ toast(added>0 ? ("已同步 "+added+" 個新足跡 👣") : "沒有新的足跡可加入"); });
+          return;
+        }
+        if(b.dataset.armed==="1"){
+          b.dataset.armed="";
+          completeTrip(t).then(function(added){ toast(added>0 ? ("完成！已加入 "+added+" 個足跡，可到足跡地圖看 👣") : "已標記完成這趟"); });
+        } else {
+          b.dataset.armed="1";
+          b.textContent="⚠️ 再點一次確認完成";
+          setTimeout(function(){ if(b&&b.dataset.armed==="1"){ b.dataset.armed=""; b.textContent="✓ 我們完成這趟旅行了，加進足跡"; } },3000);
+        }
+      });
+    });
+    el.querySelectorAll('[data-undone]').forEach(function(b){
+      b.addEventListener("click",function(){
+        if(b.dataset.armed==="1"){ b.dataset.armed=""; uncompleteTrip(t); }
+        else {
+          b.dataset.armed="1";
+          b.textContent="⚠️ 再點一次確認還原（會移除這趟自動足跡）";
+          setTimeout(function(){ if(b&&b.dataset.armed==="1"){ b.dataset.armed=""; b.textContent="↩ 取消完成（還原成進行中）"; } },4000);
+        }
       });
     });
     el.querySelectorAll('[data-export]').forEach(function(b){ b.addEventListener("click",function(){ exportTripImage(t); }); });
@@ -1157,6 +1242,15 @@
     trip.done=true; await saveTrips();
     renderAll();
     return added;
+  }
+  async function uncompleteTrip(trip){
+    var before=footprints.length;
+    footprints=footprints.filter(function(f){return f.fromTrip!==trip.id;});
+    var removed=before-footprints.length;
+    if(removed) await store.set("footprints", JSON.stringify(footprints));
+    trip.done=false; await saveTrips();
+    renderAll();
+    toast("已還原為進行中"+(removed?("，移除 "+removed+" 個自動足跡"):""));
   }
   var toastTimer;
   function toast(msg){ var el=$("toast"); if(!el) return; el.textContent=msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){el.classList.remove("show");},2800); }
@@ -1688,9 +1782,69 @@
     var b=$("burger"); if(b)b.addEventListener("click",openDrawer);
     var sc=$("navScrim"); if(sc)sc.addEventListener("click",closeDrawer);
     var pu=$("naviPush"); if(pu)pu.addEventListener("click",function(){ closeDrawer(); window.enablePush&&window.enablePush(); });
+    var rm=$("naviReminders"); if(rm)rm.addEventListener("click",function(){ closeDrawer(); window.__openReminders&&window.__openReminders(); });
     var m=$("naviMembers"); if(m)m.addEventListener("click",function(){ closeDrawer(); window.__openMembers&&window.__openMembers(); });
     var tr=$("naviTrash"); if(tr)tr.addEventListener("click",function(){ closeDrawer(); window.__openTrash&&window.__openTrash(); });
     var lo=$("naviLogout"); if(lo)lo.addEventListener("click",function(){ window.fbAuth&&window.fbAuth.signOut(); });
+  })();
+
+  /* ---------- 提醒（手動新增 + 即將到來；自動 15 分鐘由雲端排程處理） ---------- */
+  var REM_CATS=[["✈️","出發"],["🎟","購票"],["🍽","訂位"],["🎒","打包"],["🔔","自訂"]];
+  var remFormCat="出發";
+  function remIcon(c){var f=REM_CATS.find(function(x){return x[1]===c;});return f?f[0]:"🔔";}
+  function remP(n){return ("0"+n).slice(-2);}
+  function remFmt(at){var x=new Date(at);return x.getFullYear()+"."+remP(x.getMonth()+1)+"."+remP(x.getDate())+" "+remP(x.getHours())+":"+remP(x.getMinutes());}
+  function remWhen(at){var now=Date.now(),day=86400000;var t0=new Date();t0.setHours(0,0,0,0);var d1=new Date(at),d0=new Date(at);d0.setHours(0,0,0,0);var days=Math.round((d0-t0)/day);var hm=remP(d1.getHours())+":"+remP(d1.getMinutes());if(at<now-60000)return{t:"已過期",c:"past"};if(days<=0)return{t:"今天 "+hm,c:"today"};if(days===1)return{t:"明天 "+hm,c:"soon"};if(days<=7)return{t:days+" 天後",c:"soon"};return{t:(d1.getMonth()+1)+"/"+d1.getDate(),c:""};}
+  async function remLoad(){ try{ var raw=await window.cloudStore.get("reminders"); return raw?JSON.parse(raw):[]; }catch(e){ return []; } }
+  async function remSave(list){ await window.cloudStore.set("reminders", JSON.stringify(list)); }
+  function buildRemForm(){
+    $("remCats").innerHTML=REM_CATS.map(function(c){return '<span class="rem-cat'+(remFormCat===c[1]?" on":"")+'" data-rc="'+c[1]+'">'+c[0]+' '+c[1]+'</span>';}).join("");
+    $("remCats").querySelectorAll("[data-rc]").forEach(function(el){el.onclick=function(){remFormCat=el.dataset.rc;buildRemForm();};});
+  }
+  async function remRender(){
+    var list=await remLoad();
+    var active=list.filter(function(r){return !r.done;}).sort(function(a,b){return a.at-b.at;});
+    var next=active.filter(function(r){return r.at>=Date.now()-60000;})[0];
+    $("remBanner").innerHTML = next
+      ? '<div class="rb-ic">'+remIcon(next.cat)+'</div><div><div class="rb-l">下一個提醒 · '+remWhen(next.at).t+'</div><div class="rb-n">'+esc(next.title)+'</div><div class="rb-w">'+remFmt(next.at)+'</div></div>'
+      : '<div class="rb-ic">✓</div><div><div class="rb-n">目前沒有待辦提醒</div><div class="rb-w">在下面新增一筆</div></div>';
+    var all=list.slice().sort(function(a,b){return (a.done-b.done)||(a.at-b.at);});
+    $("remList").innerHTML = all.length ? all.map(function(r){var w=remWhen(r.at);
+      return '<div class="rem-row'+(r.done?" done":"")+'"><button class="rem-chk" data-done="'+r.id+'">✓</button><div class="rem-ic">'+remIcon(r.cat)+'</div><div class="rem-mid"><div class="rem-ti">'+esc(r.title)+'</div><div class="rem-sub">'+esc(r.cat)+' · '+remFmt(r.at)+'</div></div><div class="rem-when '+w.c+'">'+w.t+'</div><button class="rem-x" data-del="'+r.id+'">✕</button></div>';
+    }).join("") : '<div class="rem-empty">還沒有提醒</div>';
+    $("remList").querySelectorAll("[data-done]").forEach(function(b){b.onclick=async function(){var l=await remLoad();var r=l.find(function(x){return x.id===b.dataset.done;});if(r){r.done=!r.done;await remSave(l);await remRender();}};});
+    $("remList").querySelectorAll("[data-del]").forEach(function(b){b.onclick=async function(){var l=await remLoad();l=l.filter(function(x){return x.id!==b.dataset.del;});await remSave(l);await remRender();};});
+  }
+  var TZ_LIST=[["Asia/Taipei","台灣"],["Asia/Tokyo","日本"],["Asia/Seoul","韓國"],["Asia/Shanghai","中國"],["Asia/Hong_Kong","香港"],["Asia/Bangkok","泰國／越南"],["Asia/Singapore","新加坡"],["Europe/Helsinki","芬蘭"],["Europe/Oslo","挪威／瑞典／丹麥"],["Europe/London","英國／葡萄牙"],["Europe/Paris","法／德／西／義（中歐）"],["America/New_York","美東"],["America/Los_Angeles","美西"],["Australia/Sydney","雪梨"]];
+  function deviceTz(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Taipei"; }catch(e){ return "Asia/Taipei"; } }
+  async function buildTzSelect(){
+    var cur=null; try{ cur=await window.cloudStore.get("reminder_tz"); }catch(e){}
+    if(!cur) cur=deviceTz();
+    var list=TZ_LIST.slice();
+    if(!list.some(function(x){return x[0]===cur;})) list.unshift([cur, cur+"（你目前的裝置）"]);
+    var sel=$("remTz"); if(!sel) return;
+    sel.innerHTML=list.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===cur?" selected":"")+'>'+t[1]+'（'+t[0]+'）</option>';}).join("");
+    sel.onchange=async function(){ try{ await window.cloudStore.set("reminder_tz", sel.value); $("remMsg").textContent="時區已設定："+sel.value; }catch(e){} };
+    // 首次沒存過就把預設寫進去，雲端才有依據
+    try{ var saved=await window.cloudStore.get("reminder_tz"); if(!saved) await window.cloudStore.set("reminder_tz", cur); }catch(e){}
+  }
+  window.__openReminders=async function(){
+    $("reminderModal").style.display="flex"; buildRemForm(); await buildTzSelect();
+    var t=new Date(); t.setDate(t.getDate()+1); $("remDate").value=t.toISOString().slice(0,10);
+    if(!$("remTime").value) $("remTime").value="09:00";
+    await remRender();
+  };
+  (function(){
+    var c=$("remClose"); if(c)c.onclick=function(){$("reminderModal").style.display="none";};
+    var mm=$("reminderModal"); if(mm)mm.onclick=function(e){ if(e.target===mm) mm.style.display="none"; };
+    var add=$("remAdd"); if(add)add.onclick=async function(){
+      var title=($("remTitle").value||"").trim(), dt=$("remDate").value, tm=$("remTime").value||"09:00";
+      if(!title){$("remMsg").textContent="先填提醒內容";return;}
+      if(!dt){$("remMsg").textContent="選一個日期";return;}
+      var at=new Date(dt+"T"+tm+":00").getTime();
+      var l=await remLoad(); l.push({id:"rm"+Date.now(),title:title,cat:remFormCat,at:at,done:false});
+      await remSave(l); $("remTitle").value=""; $("remMsg").textContent="已加入 ✓"; await remRender();
+    };
   })();
 
   /* ---------- memory modal ---------- */
@@ -1944,6 +2098,26 @@
     </div>
     <div class="mm-msg" id="mmMsg"></div>
     <button class="mm-close" id="mmClose">關閉</button>
+  </div>
+</div>
+
+<div id="reminderModal">
+  <div class="rem-card">
+    <h3>提醒</h3>
+    <div class="rem-cap">行程裡「有填時間」的景點會在開始前 15 分鐘自動提醒；下面可另外手動新增（發給所有成員）。</div>
+    <div class="rem-tz"><small>自動提醒時區（行程時間依這個算）</small><select id="remTz"></select></div>
+    <div class="rem-banner" id="remBanner"></div>
+    <div class="rem-lh">提醒清單</div>
+    <div id="remList"></div>
+    <div class="rem-form">
+      <div class="rem-lh2">＋ 新增提醒</div>
+      <input id="remTitle" type="text" placeholder="例如：買門票、預約餐廳、開始打包…" autocomplete="off">
+      <div class="rem-row2"><input id="remDate" type="date"><input id="remTime" type="time" value="09:00"></div>
+      <div class="rem-cats" id="remCats"></div>
+      <button id="remAdd">加入提醒</button>
+      <div class="rem-msg" id="remMsg"></div>
+    </div>
+    <button class="rem-close" id="remClose">關閉</button>
   </div>
 </div>
 
