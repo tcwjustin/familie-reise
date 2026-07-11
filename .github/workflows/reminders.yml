@@ -1,0 +1,20 @@
+name: reminders
+on:
+  schedule:
+    - cron: '*/5 * * * *'    # 每 5 分鐘（GitHub 排程最短就是 5 分鐘，且偶爾會延遲幾分鐘）
+  workflow_dispatch: {}       # 讓你可以在 Actions 頁手動按一下立即測試
+permissions:
+  contents: read
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install firebase-admin luxon
+      - name: Send reminders
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node send-reminders.js
