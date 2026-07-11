@@ -879,7 +879,8 @@
       var big=$("nextTripBig"), biglab=$("nextTripBigLab");
       if(big) big.textContent = diff===0 ? "今天" : diff;
       if(biglab) biglab.textContent = diff===0 ? "出發" : "天後";
-      nd.textContent = fmtDate(bestDate.toISOString().slice(0,10)) + " 出發";
+      var _bd=bestDate, _iso=_bd.getFullYear()+"-"+("0"+(_bd.getMonth()+1)).slice(-2)+"-"+("0"+_bd.getDate()).slice(-2);
+      nd.textContent = fmtDate(_iso) + " 出發";
     } else if(nn){
       nn.textContent = "還沒安排 ✈️";
       var big2=$("nextTripBig"), bl2=$("nextTripBigLab");
@@ -1830,7 +1831,7 @@
   }
   window.__openReminders=async function(){
     $("reminderModal").style.display="flex"; buildRemForm(); await buildTzSelect();
-    var t=new Date(); t.setDate(t.getDate()+1); $("remDate").value=t.toISOString().slice(0,10);
+    var t=new Date(); t.setDate(t.getDate()+1); $("remDate").value=t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2);
     if(!$("remTime").value) $("remTime").value="09:00";
     await remRender();
   };
@@ -1856,7 +1857,7 @@
     pickLat=(prefill.lat!=null)?prefill.lat:null; pickLng=(prefill.lng!=null)?prefill.lng:null;
     $("memModalTitle").textContent=prefill.fpId?"補上這個足跡的回憶":"新增一段回憶";
     $("mTitle").value=prefill.title||"";
-    $("mDate").value=prefill.date||new Date().toISOString().slice(0,10);
+    var _mn=new Date(); $("mDate").value=prefill.date||(_mn.getFullYear()+"-"+("0"+(_mn.getMonth()+1)).slice(-2)+"-"+("0"+_mn.getDate()).slice(-2));
     $("mPlace").value=prefill.place||""; $("mNote").value=prefill.note||"";
     $("mPreview").style.display="none";
     $("coordHint").textContent=(pickLat!=null)?"已標記位置 ✓":"尚未標記位置";
