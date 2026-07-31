@@ -832,6 +832,13 @@
 
   /* ---------- helpers ---------- */
   function $(id){return document.getElementById(id);}
+  /* 事件委派：修正「關閉」鈕（這些視窗 HTML 在主程式之後，載入時綁不到，改用委派） */
+  document.addEventListener("click", function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    var cb=t.closest("#remClose,#exClose,#mmClose");
+    if(cb){ var m=cb.closest("#reminderModal,#expenseModal,#memberModal"); if(m) m.style.display="none"; return; }
+    if(t.id==="reminderModal"||t.id==="expenseModal"||t.id==="memberModal"){ t.style.display="none"; }
+  });
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
   function esc(s){return (s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmtDate(d){ if(!d) return ""; var p=d.split("-"); return p.length===3 ? p[0]+"年"+(+p[1])+"月"+(+p[2])+"日" : d; }
