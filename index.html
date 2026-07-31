@@ -209,6 +209,8 @@
   .complete-trip{background:var(--terra);color:var(--on-accent);border:none;border-radius:14px;padding:12px 24px;font-family:var(--body);font-weight:700;font-size:15px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s}
   .complete-trip:hover{transform:translateY(-2px)}
   .complete-trip.is-done{background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--kraft-deep);box-shadow:none}
+  .uncomplete-trip{background:var(--surface-3);color:var(--ink-soft);border:1px solid var(--kraft-deep);border-radius:14px;padding:12px 20px;font-family:var(--body);font-weight:600;font-size:14px;cursor:pointer}
+  .uncomplete-trip:hover{color:var(--ink)}
   .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:var(--terra-deep);color:var(--on-accent);padding:12px 20px;border-radius:16px;font-weight:600;font-size:14px;z-index:1400;box-shadow:0 10px 26px rgba(60,50,35,.35);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .pp-btn{border:none;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;font-family:var(--body)}
@@ -354,36 +356,240 @@
     #map{height:340px}
   }
 
+
+  /* --- hamburger nav + drawer --- */
+  .navbar{display:flex;align-items:center;gap:12px;margin:26px auto 22px;max-width:560px}
+  .burger{width:44px;height:44px;flex-shrink:0;border:1.5px solid var(--kraft-deep);background:var(--paper-2);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;box-shadow:var(--shadow)}
+  .burger span{width:18px;height:2px;background:var(--ink);border-radius:2px}
+  .navbar-title{font-family:var(--hand);font-weight:700;font-size:22px;color:var(--ink)}
+  .scrim{position:fixed;inset:0;background:var(--overlay);opacity:0;visibility:hidden;transition:.25s;z-index:4000}
+  .scrim.open{opacity:1;visibility:visible}
+  .drawer{position:fixed;top:0;left:0;bottom:0;width:260px;max-width:82vw;background:var(--paper-2);border-right:1px solid var(--kraft-deep);transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:4100;display:flex;flex-direction:column;padding:22px 14px;overflow:auto;box-shadow:0 0 44px rgba(0,0,0,.14)}
+  .drawer.open{transform:none}
+  .drawer-head{padding:6px 8px 16px;border-bottom:1px solid var(--line-soft);margin-bottom:10px}
+  .drawer-head .dt{font-family:var(--hand);font-weight:700;font-size:24px;color:var(--ink)}
+  .drawer-head .ds{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+  .navi{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-family:var(--body);font-weight:500;font-size:15px;color:var(--ink-soft);text-align:left}
+  .navi .ic{width:22px;text-align:center;font-size:17px}
+  .navi:hover{background:var(--kraft)}
+  .navi.active{background:var(--accent-tint);color:var(--terra-deep);font-weight:700}
+  .navi.out{color:var(--ink-soft);margin-top:6px}
+  .drawer-sep{height:1px;background:var(--line-soft);margin:8px 6px}
+  .navi #trashBadge:not(:empty){margin-left:6px;background:var(--rose);color:var(--on-accent);border-radius:10px;padding:0 6px;font-size:11px;font-family:var(--mono)}
+  /* --- boarding-pass hero --- */
+  .hero-card.pass{display:flex;align-items:stretch;gap:0;padding:0;overflow:hidden;text-align:left;position:relative}
+  .pass .pass-main{flex:1;padding:18px 20px;min-width:0}
+  .pass .hn-label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);margin-bottom:6px}
+  .pass .hn-name{font-family:var(--hand);font-size:24px;font-weight:700;color:var(--ink);line-height:1.15}
+  .pass .pass-fly{display:flex;align-items:center;gap:6px;color:var(--terra);font-size:12px;margin:9px 0}
+  .pass .pass-fly i{flex:1;border-top:1.5px dotted var(--ink-soft);opacity:.7}
+  .pass .hn-date{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.02em;line-height:1.5}
+  .pass .pass-stub{width:104px;flex-shrink:0;border-left:2px dashed var(--kraft-deep);background:var(--accent-tint);padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .pass .stub-num{font-family:var(--hand);font-weight:700;font-size:40px;line-height:1;color:var(--terra)}
+  .pass .stub-lab{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px}
+  .pass .stub-seal{font-size:17px;margin-top:8px}
+  .pass .pass-notch{position:absolute;right:96px;width:16px;height:16px;border-radius:50%;background:var(--paper);border:1.5px solid var(--kraft-deep)}
+  .pass .pass-notch.pn-t{top:-8px}
+  .pass .pass-notch.pn-b{bottom:-8px}
+  @media(max-width:400px){ .pass .pass-stub{width:88px} .pass .pass-notch{right:80px} }
+
+  /* ---------- 提醒視窗 ---------- */
+  #reminderModal{position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;padding:20px;background:var(--overlay)}
+  #reminderModal .rem-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:400px;max-height:86vh;overflow:auto;padding:20px}
+  #reminderModal h3{font-family:var(--hand);font-size:22px;margin:0 0 4px;color:var(--ink)}
+  .rem-cap{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:14px}
+  .rem-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--accent-tint),var(--surface-3));border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .rem-banner .rb-ic{width:40px;height:40px;border-radius:11px;background:var(--terra);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .rem-banner .rb-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--terra-deep)}
+  .rem-banner .rb-n{font-family:var(--hand);font-weight:700;font-size:15px;margin-top:1px}
+  .rem-banner .rb-w{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+  .rem-lh,.rem-lh2{font-family:var(--hand);font-weight:700;font-size:15px;margin:10px 0 8px}
+  .rem-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+  .rem-row:first-child{border-top:none}
+  .rem-chk{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--kraft-deep);background:var(--paper);cursor:pointer;flex-shrink:0;color:transparent;font-size:13px}
+  .rem-row.done .rem-chk{background:var(--sage);border-color:var(--sage);color:#fff}
+  .rem-ic{width:34px;height:34px;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .rem-mid{flex:1;min-width:0}
+  .rem-ti{font-size:14px;font-weight:500}
+  .rem-row.done .rem-ti{text-decoration:line-through;color:var(--ink-3)}
+  .rem-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .rem-when{font-family:var(--mono);font-size:11.5px;font-weight:700;flex-shrink:0;text-align:right}
+  .rem-when.soon{color:var(--terra)} .rem-when.today{color:var(--rose)} .rem-when.past{color:var(--ink-3)}
+  .rem-x{border:none;background:none;color:var(--ink-3);font-size:14px;cursor:pointer;opacity:.55}
+  .rem-empty{color:var(--ink-3);font-size:13px;text-align:center;padding:14px}
+  .rem-form{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:6px}
+  .rem-form input{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--surface-3);border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .rem-form input:focus{outline:none;border-color:var(--terra)}
+  .rem-row2{display:flex;gap:8px}.rem-row2 input{flex:1;min-width:0}
+  .rem-cats{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .rem-cat{font-size:12.5px;padding:7px 11px;border-radius:999px;border:1px solid var(--kraft-deep);background:var(--paper);cursor:pointer;color:var(--ink-soft)}
+  .rem-cat.on{background:var(--accent-tint);border-color:var(--terra);color:var(--terra-deep);font-weight:500}
+  #remAdd{width:100%;margin-top:14px;border:none;border-radius:11px;background:var(--terra);color:var(--on-accent);font-family:var(--body);font-weight:700;font-size:15px;padding:12px;cursor:pointer}
+  .rem-msg{font-size:12.5px;color:var(--ink-soft);min-height:16px;margin-top:8px}
+  .rem-close{margin-top:14px;width:100%;border:1px solid var(--kraft-deep);background:transparent;color:var(--ink-soft);border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--body)}
+
+  .rem-tz{background:var(--surface-3);border:1px solid var(--line-soft);border-radius:11px;padding:10px 12px;margin-bottom:14px}
+  .rem-tz small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:6px}
+  .rem-tz select{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:9px;padding:9px 10px}
+  .rem-tz select:focus{outline:none;border-color:var(--terra)}
+
+  .trip-notes{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;margin:8px 0 4px;overflow:hidden}
+  .trip-notes .tn-head{padding:12px 16px;font-family:var(--hand);font-weight:700;font-size:15px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .trip-notes .tn-arrow{font-size:11px;color:var(--ink-soft);transition:transform .2s}
+  .trip-notes.open .tn-arrow{transform:rotate(180deg)}
+  .trip-notes .tn-body{display:none;padding:2px 16px 14px;font-size:13.5px;line-height:1.7;color:var(--ink-soft);white-space:pre-wrap;outline:none}
+  .trip-notes.open .tn-body{display:block}
+  .trip-notes .tn-body:empty::before{content:"點這裡輸入注意事項／攻略…";color:var(--ink-3)}
+  .trip-notes .tn-body:focus{color:var(--ink)}
+  .trip-notes.has .tn-head{color:var(--terra-deep)}
+
+  #memberModal .mm-group-row{margin-top:8px}
+  #memberModal .mm-group-row small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:5px}
+  #memberModal .mm-group-row input{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:9px;padding:9px 11px}
+  #memberModal .mm-group-row input:focus{outline:none;border-color:var(--terra)}
+  #memberModal .mm-grp{width:92px;flex-shrink:0;font-family:var(--body);font-size:12.5px;color:var(--ink);background:var(--surface-3);border:1px solid var(--kraft-deep);border-radius:8px;padding:6px 8px}
+  #memberModal .mm-grp:focus{outline:none;border-color:var(--terra)}
+  #memberModal .mm-grp-tag{font-family:var(--mono);font-size:10px;color:var(--terra-deep);background:var(--accent-tint);border-radius:6px;padding:3px 8px;white-space:nowrap}
+
+  #expenseModal{position:fixed;inset:0;z-index:6100;display:none;align-items:center;justify-content:center;padding:18px;background:var(--overlay)}
+  #expenseModal .ex-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:420px;max-height:88vh;overflow:auto;padding:20px}
+  #expenseModal h3{font-family:var(--hand);font-size:22px;margin:0 0 12px;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  #expenseModal .ex-trip{font-family:var(--body);font-size:13px;color:var(--ink-soft);font-weight:400}
+  .ex-rates-wrap{border:1px solid var(--line-soft);border-radius:12px;margin-bottom:14px;overflow:hidden}
+  .ex-rates-toggle{padding:10px 14px;font-size:13px;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--body);font-weight:500}
+  .ex-arrow{font-size:11px;color:var(--ink-soft);transition:transform .2s}
+  .ex-rates-wrap.open .ex-arrow{transform:rotate(180deg)}
+  .ex-rates{display:none;flex-wrap:wrap;gap:8px;padding:0 14px 12px}
+  .ex-rates-wrap.open .ex-rates{display:flex}
+  .ex-rate{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .ex-rate input{width:66px;font-family:var(--mono);font-size:13px;border:1px solid var(--kraft-deep);border-radius:7px;padding:5px 7px;background:var(--surface-3);color:var(--ink)}
+  .ex-ov{background:linear-gradient(135deg,var(--accent-tint),var(--surface-3));border:1px solid var(--line-soft);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .ex-ovl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra-deep)}
+  .ex-ovv{font-family:var(--hand);font-weight:700;font-size:28px;color:var(--ink);line-height:1.1;margin-top:2px}
+  .ex-ovm{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:3px}
+  .ex-mlist{display:flex;flex-direction:column;gap:6px}
+  .ex-mrow{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px}
+  .ex-g{font-size:14px;font-weight:500}
+  .ex-bal{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right}
+  .ex-bal small{display:block;font-size:9px;font-weight:400;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase}
+  .ex-bal.pos{color:var(--sage)} .ex-bal.neg{color:var(--rose)} .ex-bal.zero{color:var(--ink-3)}
+  .ex-h{font-family:var(--hand);font-weight:700;font-size:15px;margin:16px 0 8px}
+  .ex-settle{display:flex;flex-direction:column;gap:8px}
+  .ex-srow{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;font-size:13.5px}
+  .ex-srow .ex-arr{color:var(--ink-3)} .ex-srow .ex-amt{margin-left:auto;font-family:var(--mono);font-weight:700;color:var(--terra-deep)}
+  .ex-done{font-family:var(--mono);font-size:12px;color:var(--sage);text-align:center;padding:8px}
+  .ex-elist{display:flex;flex-direction:column}
+  .ex-erow{display:flex;align-items:center;gap:11px;padding:11px 2px;border-top:1px solid var(--line-soft)}
+  .ex-erow:first-child{border-top:none}
+  .ex-ic{width:34px;height:34px;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .ex-mid{flex:1;min-width:0}.ex-ti{font-size:14px;font-weight:500}.ex-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .ex-rt .ex-a{font-family:var(--mono);font-weight:700;font-size:13px;text-align:right;white-space:nowrap}
+  .ex-x{border:none;background:none;color:var(--ink-3);font-size:14px;cursor:pointer;opacity:.5}
+  .ex-empty{color:var(--ink-3);font-size:13px;text-align:center;padding:14px}
+  .ex-form{margin-top:16px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .ex-form input[type=text],.ex-form input[type=number],.ex-form select{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--surface-3);border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .ex-form input:focus,.ex-form select:focus{outline:none;border-color:var(--terra)}
+  .ex-lb{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:12px 0 0}
+  .ex-r2{display:flex;gap:8px}.ex-r2 input{flex:2}.ex-r2 select{flex:1;min-width:0}
+  .ex-cats,.ex-among,.ex-methods{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .ex-cat,.ex-among-chip,.ex-method{font-size:12.5px;padding:7px 11px;border-radius:999px;border:1px solid var(--kraft-deep);background:var(--paper);cursor:pointer;color:var(--ink-soft)}
+  .ex-cat.on,.ex-among-chip.on,.ex-method.on{background:var(--accent-tint);border-color:var(--terra);color:var(--terra-deep);font-weight:500}
+  .ex-split-in{display:flex;flex-direction:column;gap:6px;margin-top:10px;background:var(--surface-3);border-radius:10px;padding:10px}
+  .ex-split-in label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;margin:0}
+  .ex-split-in input{width:120px;font-family:var(--mono);font-size:13px;border:1px solid var(--kraft-deep);border-radius:8px;padding:7px 9px;background:var(--paper-2);color:var(--ink);margin:0}
+  #exAdd{width:100%;margin-top:16px;border:none;border-radius:11px;background:var(--terra);color:var(--on-accent);font-family:var(--body);font-weight:700;font-size:15px;padding:12px;cursor:pointer}
+  .ex-hint{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:8px}
+  .ex-msg{font-size:12.5px;color:var(--ink-soft);min-height:16px;margin-top:6px}
+  .ex-close{margin-top:14px;width:100%;border:1px solid var(--kraft-deep);background:transparent;color:var(--ink-soft);border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--body)}
+  .ex-mode{display:flex;gap:8px;margin-bottom:12px}
+  .ex-modebtn{flex:1;text-align:center;font-size:13px;padding:9px;border-radius:10px;border:1px solid var(--kraft-deep);background:var(--surface);cursor:pointer;color:var(--ink-soft);font-weight:500}
+  .ex-modebtn.on{background:var(--terra);color:var(--on-accent);border-color:var(--terra)}
+  .ex-ratcell{display:flex;align-items:center;gap:6px}
+  .ex-ratcell input{width:58px}
+  .ex-pct{color:var(--ink-soft);font-family:var(--mono);font-size:12px}
+  .ex-eq{font-family:var(--mono);font-size:11px;color:var(--terra-deep);min-width:84px;text-align:right}
+  .ex-ratsum{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:6px}
+
+  /* === 注意事項更顯眼 + 整體字體放大 === */
+  .trip-notes{background:var(--accent-tint);border:1.5px solid var(--terra);box-shadow:var(--shadow);margin:12px 0 8px}
+  .trip-notes .tn-head{font-size:17px;color:var(--terra-deep)}
+  .trip-notes .tn-body{font-size:15px;line-height:1.75;color:var(--ink)}
+  .itin-text{font-size:15.5px;line-height:1.6}
+  .itin-note{font-size:14px}
+  .itin-time{font-size:13.5px}
+  .itin-theme{font-size:16.5px}
+  .itin-date{font-size:18px}
+  .itin-dnum{font-size:28px}
+  .lodge-bar{font-size:14.5px}
+  .itin-empty-row{font-size:14px}
+  .navi{font-size:16px}
+  .navbar-title{font-size:24px}
+  .mm-name,.rem-ti,.ex-ti,.ex-g{font-size:15px}
+  .sec-title,.trip-name{}
+
+  /* === 單日檢視：日期標籤 / 每日注意事項 / 前後切換 === */
+  .day-tabs{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .day-tabs::-webkit-scrollbar{display:none}
+  .day-tab{flex:0 0 auto;font-family:var(--body);font-size:14px;font-weight:600;color:var(--ink-soft);background:var(--surface);border:1px solid var(--kraft-deep);border-radius:12px;padding:8px 13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15;min-width:52px}
+  .day-tab.on{background:var(--terra);color:var(--on-accent);border-color:var(--terra)}
+  .day-tab.today:not(.on){border-color:var(--terra);color:var(--terra-deep)}
+  .day-tab .dt-today{font-family:var(--mono);font-size:9px;letter-spacing:.04em}
+  .itin-day{display:none}
+  .itin-day.active{display:block}
+  .day-notes{background:var(--accent-tint);border:1.5px solid var(--terra);border-radius:12px;margin:4px 0 12px;overflow:hidden}
+  .day-notes .dn-head{padding:11px 14px;font-family:var(--hand);font-weight:700;font-size:16px;color:var(--terra-deep);cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+  .day-notes .dn-body{display:none;padding:2px 14px 12px;font-size:14.5px;line-height:1.72;color:var(--ink);white-space:pre-wrap;outline:none}
+  .day-notes.open .dn-body{display:block}
+  .day-notes .dn-body:empty::before{content:"點這裡寫這天的注意事項…";color:var(--ink-3)}
+  .day-nav{display:flex;align-items:center;gap:10px;margin:10px 0 4px}
+  .day-nav-btn{border:1px solid var(--kraft-deep);background:var(--surface);color:var(--ink);border-radius:11px;padding:10px 18px;font-size:17px;cursor:pointer}
+  .day-nav-btn:disabled{opacity:.35;cursor:default}
+  .day-nav-mid{flex:1;text-align:center;font-family:var(--hand);font-weight:600;font-size:14px;color:var(--ink-soft)}
 </style>
+
+<div class="scrim" id="navScrim"></div>
+<aside class="drawer" id="navDrawer">
+  <div class="drawer-head"><div class="dt">Our Journey</div><div class="ds">旅程 · 選單</div></div>
+  <button class="navi active" data-tab="itinerary"><span class="ic">🧭</span>行程</button>
+  <button class="navi" data-tab="timeline"><span class="ic">📷</span>旅行回顧</button>
+  <button class="navi" data-tab="map"><span class="ic">🗺️</span>足跡地圖</button>
+  <button class="navi" data-tab="wish"><span class="ic">⭐</span>想去清單</button>
+  <div class="drawer-sep"></div>
+  <button class="navi" id="naviPush"><span class="ic">🔔</span>開啟通知</button>
+  <button class="navi" id="naviReminders"><span class="ic">⏰</span>提醒</button>
+  <button class="navi" id="naviExpenses"><span class="ic">💰</span>分帳</button>
+  <button class="navi" id="naviMembers"><span class="ic">👥</span>成員管理</button>
+  <button class="navi" id="naviTrash"><span class="ic">🗑️</span>回收桶<span id="trashBadge"></span></button>
+  <button class="navi out" id="naviLogout"><span class="ic">↩</span>登出</button>
+</aside>
 
 <header>
   <div class="eyebrow">Our Journey · 我們的旅行足跡</div>
   <div class="title" id="coupleTitle" contenteditable="true" spellcheck="false">Our Journey</div>
 
-  <div class="hero-card">
-    <div class="hero-since">
-      <span class="hs-tag">Our Journey ・ 旅程</span>
-      <span class="hs-sub">走過的每一個地方，都值得記得 🌏</span>
-    </div>
-    <div class="hero-path" id="heroPath"></div>
-    <div class="hero-next">
-      <span class="hn-label">下一趟旅行</span>
+  <div class="hero-card pass">
+    <div class="pass-main">
+      <span class="hn-label">下一趟旅行 · Next departure</span>
       <span class="hn-name" id="nextTripName">還沒安排 ✈️</span>
-      <span class="hn-count" id="nextTripCount"></span>
-      <span class="hn-date" id="nextTripDate"></span>
+      <span class="pass-fly"><i></i>✈</span>
+      <span class="hn-date" id="nextTripDate">在「行程」幫某天填上日期，這裡就會自動倒數</span>
     </div>
+    <div class="pass-stub">
+      <span class="stub-num" id="nextTripBig">–</span>
+      <span class="stub-lab" id="nextTripBigLab">days</span>
+      <span class="stub-seal">🛂</span>
+    </div>
+    <span class="pass-notch pn-t"></span>
+    <span class="pass-notch pn-b"></span>
   </div>
 
-  <div class="tiles" id="homeTiles"></div>
 </header>
 
 <div class="wrap">
-  <nav>
-    <button class="tab active" data-tab="itinerary">✈️ 行程</button>
-    <button class="tab" data-tab="timeline">📖 旅行回顧</button>
-    <button class="tab" data-tab="map">🗺️ 足跡地圖</button>
-    <button class="tab" data-tab="wish">⭐ 想去清單</button>
-  </nav>
+  <div class="navbar">
+    <button class="burger" id="burger" aria-label="選單"><span></span><span></span><span></span></button>
+    <span class="navbar-title" id="navTitle">行程</span>
+  </div>
 
   <section class="panel active" id="itinerary"></section>
   <section class="panel" id="timeline"></section>
@@ -394,13 +600,7 @@
   </section>
   <section class="panel" id="wish"></section>
 
-  <div class="foot">Our Journey ・ 把每一趟旅行，都收進這裡 <span style="color:var(--rose)">✈️</span>
-    <div class="foot-links">
-      <button id="trashBtn" class="foot-link" onclick="window.__openTrash&&window.__openTrash()">🗑 回收桶<span id="trashBadge"></span></button>
-      <button id="membersBtn" class="foot-link" onclick="window.__openMembers&&window.__openMembers()">👤 成員</button>
-      <button id="logoutBtn" class="foot-link" onclick="window.fbAuth&&window.fbAuth.signOut()">登出</button>
-    </div>
-  </div>
+  <div class="foot">Our Journey ・ 把每一趟旅行，都收進這裡 <span style="color:var(--rose)">✈️</span></div>
 </div>
 
 <button class="fab" id="fab" style="display:none">＋ 新增回憶</button>
@@ -498,7 +698,8 @@
     <label>從想去清單挑（可選）</label>
     <select id="stopWish"></select>
     <label>地點 / 行程</label>
-    <input type="text" id="stopName" placeholder="例如：清水寺">
+    <input type="text" id="stopName" placeholder="打字搜尋地點，例如：清水寺 / Helsinki" autocomplete="off">
+    <div class="geo-results" id="stopResults"></div>
     <label>國家 / 城市・鄉鎮（可選）</label>
     <div style="display:flex;gap:8px">
       <input type="text" id="stopCountry" placeholder="國家" style="flex:1">
@@ -571,7 +772,7 @@
 <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 <script>
   /* ⬇⬇⬇ 把這裡換成你的 Google Maps API 金鑰 ⬇⬇⬇ */
-  window.GMAPS_KEY = "貼上你的_Google_Maps_API_金鑰";
+  window.GMAPS_KEY = "AIzaSyAPmtfJZdKIKiHBnXgd87Hj28Scpq-mUbA";
   /* ⬆⬆⬆ 只要改這一行 ⬆⬆⬆ */
   window.gmReady = false;
   window.__gmReady = function(){ window.gmReady = true; if(window.__onGmReady) window.__onGmReady(); };
@@ -631,6 +832,13 @@
 
   /* ---------- helpers ---------- */
   function $(id){return document.getElementById(id);}
+  /* 事件委派：修正「關閉」鈕（這些視窗 HTML 在主程式之後，載入時綁不到，改用委派） */
+  document.addEventListener("click", function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    var cb=t.closest("#remClose,#exClose,#mmClose");
+    if(cb){ var m=cb.closest("#reminderModal,#expenseModal,#memberModal"); if(m) m.style.display="none"; return; }
+    if(t.id==="reminderModal"||t.id==="expenseModal"||t.id==="memberModal"){ t.style.display="none"; }
+  });
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
   function esc(s){return (s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmtDate(d){ if(!d) return ""; var p=d.split("-"); return p.length===3 ? p[0]+"年"+(+p[1])+"月"+(+p[2])+"日" : d; }
@@ -699,6 +907,7 @@
       await store.set("footprints", JSON.stringify(footprints));
     }
     renderAll();
+    setupLiveSync();
   }
 
   /* ---------- live sync: 回到 App / 切回分頁時，自動重抓最新資料 ---------- */
@@ -739,6 +948,25 @@
   window.addEventListener("focus", refreshIfIdle);
   window.addEventListener("online", refreshIfIdle);
 
+  /* ---------- 即時同步：雲端一有變動就自動重抓（trips/清單/回憶/回收桶） ---------- */
+  var _liveSyncSet=false, _syncTimer=null;
+  function onRemoteChange(){
+    clearTimeout(_syncTimer);
+    _syncTimer=setTimeout(function run(){
+      if(!__started){ _syncTimer=setTimeout(run,800); return; }
+      if(document.querySelector(".overlay.show, .light.show") || (document.activeElement && document.activeElement.isContentEditable)){ _syncTimer=setTimeout(run,1000); return; }
+      refreshIfIdle();
+    }, 500);
+  }
+  function setupLiveSync(){
+    if(_liveSyncSet || !window.cloudStore || !window.cloudStore.subscribe) return;
+    _liveSyncSet=true;
+    var last={};
+    ["trips","wishlist","footprints","trash"].forEach(function(k){
+      window.cloudStore.subscribe(k, function(val){ if(last[k]===val) return; last[k]=val; onRemoteChange(); });
+    });
+  }
+
   /* ---------- render ---------- */
   function renderAll(){ renderStats(); renderTrips(); renderTimeline(); renderWishlist(); refreshMap(); }
 
@@ -759,11 +987,15 @@
     if(best && nn){
       var diff = Math.round((bestDate - today)/86400000);
       nn.textContent = (best.emoji?best.emoji+" ":"") + (best.name || "未命名旅程");
-      if(nc) nc.innerHTML = diff===0 ? "就是今天 🎉" : ('還有 <b>'+diff+'</b> 天');
-      nd.textContent = fmtDate(bestDate.toISOString().slice(0,10)) + " 出發";
+      var big=$("nextTripBig"), biglab=$("nextTripBigLab");
+      if(big) big.textContent = diff===0 ? "今天" : diff;
+      if(biglab) biglab.textContent = diff===0 ? "出發" : "天後";
+      var _bd=bestDate, _iso=_bd.getFullYear()+"-"+("0"+(_bd.getMonth()+1)).slice(-2)+"-"+("0"+_bd.getDate()).slice(-2);
+      nd.textContent = fmtDate(_iso) + " 出發";
     } else if(nn){
       nn.textContent = "還沒安排 ✈️";
-      if(nc) nc.textContent = "";
+      var big2=$("nextTripBig"), bl2=$("nextTripBigLab");
+      if(big2) big2.textContent = "–"; if(bl2) bl2.textContent = "days";
       nd.textContent = "在「行程」幫某天填上日期，這裡就會自動倒數";
     }
 
@@ -940,7 +1172,7 @@
           '</div>';
         });
       } else { html+='<div style="color:#9A9284;font-size:13px">（這天還沒排景點）</div>'; }
-      if(d.lodging&&d.lodging.name){ html+='<div style="margin-top:7px;font-size:13px;color:#8a6d2e;background:#f9f0db;border-radius:8px;padding:6px 11px">🏨 '+esc(d.lodging.name)+(d.lodging.code?'　訂單 '+esc(d.lodging.code):'')+'</div>'; }
+      if(d.lodging&&d.lodging.name){ html+='<div style="margin-top:7px;font-size:13px;color:#8a6d2e;background:#f9f0db;border-radius:8px;padding:6px 11px">🏡 '+esc(d.lodging.name)+(d.lodging.code?'　訂單 '+esc(d.lodging.code):'')+'</div>'; }
       html+='</div>';
     });
     html+='<div style="text-align:center;font-size:12px;color:#9A9284;margin-top:10px">— Our Journey ・ 把每一趟旅行，都收進這裡 ✈️ —</div></div>';
@@ -961,6 +1193,7 @@
     }catch(e){ toast("產生圖片失敗，請再試一次 🙏"); }
     if(host.parentNode) document.body.removeChild(host);
   }
+  var viewDayN=null;
   function renderTrips(){
     var el=$("itinerary");
     var bar='<div class="trip-bar">'+trips.map(function(t){
@@ -976,8 +1209,11 @@
       '<div class="trip-tools">'+
         '<button class="export-trip" data-export="'+t.id+'">📤 匯出行程圖片</button>'+
         '<button class="complete-trip'+(t.done?' is-done':'')+'" data-done="'+t.id+'">'+(t.done?'✓ 已完成這趟（再點同步新景點）':'✓ 我們完成這趟旅行了，加進足跡')+'</button>'+
+        (t.done?'<button class="uncomplete-trip" data-undone="'+t.id+'">↩ 取消完成（還原成進行中）</button>':'')+
         '<button class="del-trip" data-deltrip="'+t.id+'">🗑 刪除這個旅程</button>'+
       '</div>';
+
+    detail += '<div class="day-tabs" id="dayTabs"></div>';
 
     detail += days.map(function(d){
       var mode=d.travelMode||"DRIVE";
@@ -995,16 +1231,20 @@
               '<span class="drag-h" title="拖曳排序">⠿</span>'+
               '<span class="itin-time" data-edittime="'+s.id+'">'+(tlabel?esc(tlabel):'<span class="t-add">＋ 時間</span>')+'</span>'+
               '<span class="itin-text">'+esc(s.name||"")+(s.note?' <span class="itin-note">· '+esc(s.note)+'</span>':'')+'</span>'+
-              (s.lat!=null?'<button class="nav-btn" data-nav="'+s.id+'" title="用 Google Maps 導航">🧭</button>':'')+
+              '<button class="nav-btn" data-nav="'+s.id+'" title="用 Google Maps 導航">🧭</button>'+
               '<button class="stop-del" data-delstop="'+s.id+'" title="刪除">×</button></div>'+
           '</div>';
         });
       } else { rows='<div class="itin-empty-row">這天還沒排景點（可從別天拖過來）</div>'; }
-      return '<div class="itin-day">'+
+      return '<div class="itin-day" data-daypage="'+d.n+'">'+
         '<div class="itin-head"><span class="itin-dnum">DAY '+d.n+'</span>'+
           (d.date?'<span class="itin-date">'+(+d.date.slice(5,7))+'/'+(+d.date.slice(8))+'</span>':'')+
           (days.length>1?'<button class="day-del" data-delday="'+d.n+'" title="刪除這天">✕</button>':'')+'</div>'+
         '<div class="itin-theme" contenteditable="true" spellcheck="false" data-eday="'+d.n+'">'+esc(d.theme||"（點這裡寫今天主題）")+'</div>'+
+        '<div class="day-notes'+((d.notes&&String(d.notes).trim())?' has open':'')+'" data-dnwrap="'+d.n+'">'+
+          '<div class="dn-head" data-dntoggle="'+d.n+'">⚠️ 當天注意事項<span class="tn-arrow">▾</span></div>'+
+          '<div class="dn-body" data-dnedit="'+d.n+'" contenteditable="true" spellcheck="false">'+((d.notes&&String(d.notes).trim())?esc(d.notes):'')+'</div>'+
+        '</div>'+
         '<div class="day-tools">'+
           '<label class="dt-start">出發 <input type="time" data-starttime="'+d.n+'" value="'+(d.startTime||"")+'"></label>'+
           '<button class="dt-mode" data-mode="'+d.n+'" title="切換交通方式">'+(mode==="TRANSIT"?"🚆 電車":"🚗 開車")+'</button>'+
@@ -1013,7 +1253,7 @@
         '<div class="day-stops" data-daystops="'+d.n+'">'+rows+'</div>'+
         '<button class="add-link" data-addstop="'+d.n+'">＋ 加景點</button>'+
         ((d.lodging&&d.lodging.name) ?
-          '<div class="lodge-bar" data-lodge="'+d.n+'">🏨 <b>'+esc(d.lodging.name)+'</b>'+
+          '<div class="lodge-bar" data-lodge="'+d.n+'">🏡 <b>'+esc(d.lodging.name)+'</b>'+
             ((d.lodging.checkin||d.lodging.checkout)?'<span class="lg-sub">'+esc([fmtDate(d.lodging.checkin),fmtDate(d.lodging.checkout)].filter(Boolean).join(" → "))+'</span>':'')+
             (d.lodging.code?'<span class="lg-sub">訂單 '+esc(d.lodging.code)+'</span>':'')+
           '</div>'
@@ -1021,6 +1261,7 @@
       '</div>';
     }).join("");
 
+    detail += '<div class="day-nav"><button class="day-nav-btn" id="dayPrev">←</button><span class="day-nav-mid" id="dayNavLabel"></span><button class="day-nav-btn" id="dayNext">→</button></div>';
     detail += '<div class="add-day-wrap"><button class="add-link" id="addDay">＋ 加一天</button></div>';
 
     el.innerHTML = bar + detail;
@@ -1029,6 +1270,37 @@
     var nm=el.querySelector('[data-ename]');
     nm.addEventListener("blur",function(){ t.name=nm.textContent.trim()||"未命名旅程"; saveTrips(); renderTrips(); });
     nm.addEventListener("keydown",function(e){ if(e.key==="Enter"){e.preventDefault();nm.blur();} });
+    // ---- 單日檢視：日期標籤 + 前後切換 + 每日注意事項 ----
+    function localTodayISO(){ var n=new Date(); return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2); }
+    var WK=["日","一","二","三","四","五","六"];
+    function dayLabel(d){ if(!d.date) return "DAY "+d.n; var mo=+d.date.slice(5,7), da=+d.date.slice(8); var wd=new Date(d.date+"T00:00:00").getDay(); return mo+"/"+da+"·"+WK[wd]; }
+    var daysSorted=t.days.slice().sort(function(a,b){return a.n-b.n;});
+    var todayISO=localTodayISO();
+    if(viewDayN==null || !t.days.some(function(x){return x.n===viewDayN;})){
+      var todayDay=daysSorted.find(function(d){return d.date===todayISO;});
+      viewDayN = todayDay ? todayDay.n : (daysSorted[0]?daysSorted[0].n:null);
+    }
+    var tabsEl=$("dayTabs");
+    if(tabsEl){
+      tabsEl.innerHTML=daysSorted.map(function(d){ var isToday=d.date===todayISO; return '<button class="day-tab'+(d.n===viewDayN?" on":"")+(isToday?" today":"")+'" data-daytab="'+d.n+'">'+esc(dayLabel(d))+(isToday?'<span class="dt-today">今天</span>':'')+'</button>'; }).join("");
+      tabsEl.querySelectorAll('[data-daytab]').forEach(function(b){ b.addEventListener("click",function(){ showDay(+b.getAttribute("data-daytab")); }); });
+    }
+    function showDay(n){
+      viewDayN=n;
+      el.querySelectorAll('.itin-day').forEach(function(dd){ dd.classList.toggle('active', (+dd.getAttribute('data-daypage'))===n); });
+      if(tabsEl){ tabsEl.querySelectorAll('[data-daytab]').forEach(function(b){ b.classList.toggle('on', (+b.getAttribute('data-daytab'))===n); }); var onb=tabsEl.querySelector('.day-tab.on'); if(onb&&onb.scrollIntoView) onb.scrollIntoView({inline:"center",block:"nearest"}); }
+      var idx=daysSorted.findIndex(function(d){return d.n===n;});
+      var lbl=$("dayNavLabel"); if(lbl){ var dd=daysSorted[idx]; lbl.textContent=(dd&&dd.date?fmtDate(dd.date):("DAY "+n))+(dd&&dd.theme?" · "+dd.theme:""); }
+      var pv=$("dayPrev"), nx=$("dayNext"); if(pv)pv.disabled=idx<=0; if(nx)nx.disabled=idx>=daysSorted.length-1;
+    }
+    var pvBtn=$("dayPrev"), nxBtn=$("dayNext");
+    if(pvBtn)pvBtn.addEventListener("click",function(){ var idx=daysSorted.findIndex(function(d){return d.n===viewDayN;}); if(idx>0)showDay(daysSorted[idx-1].n); });
+    if(nxBtn)nxBtn.addEventListener("click",function(){ var idx=daysSorted.findIndex(function(d){return d.n===viewDayN;}); if(idx<daysSorted.length-1)showDay(daysSorted[idx+1].n); });
+    el.querySelectorAll('[data-dnwrap]').forEach(function(w){
+      var head=w.querySelector('[data-dntoggle]'); if(head)head.addEventListener('click',function(){ w.classList.toggle('open'); });
+      var body=w.querySelector('[data-dnedit]'); if(body)body.addEventListener('blur',function(){ var n=+w.getAttribute('data-dnwrap'); var dd=t.days.find(function(x){return x.n===n;}); if(dd){ dd.notes=body.textContent.replace(/\u00a0/g,' ').replace(/[ \t]+\n/g,'\n').trim(); saveTrips(); } });
+    });
+    showDay(viewDayN);
     // day theme edit
     el.querySelectorAll('[data-eday]').forEach(function(th){
       th.addEventListener("blur",function(){ var n=+th.getAttribute("data-eday"); var dd=t.days.find(function(x){return x.n===n;}); if(dd){ var v=th.textContent.trim(); dd.theme=(v==="（點這裡寫今天主題）")?"":v; saveTrips(); } });
@@ -1043,10 +1315,28 @@
     // add stop / add day
     el.querySelectorAll('[data-done]').forEach(function(b){
       b.addEventListener("click",function(){
-        completeTrip(t).then(function(added){
-          if(added>0){ toast("已加入 "+added+" 個足跡 👣"); var mt=document.querySelector('[data-tab="map"]'); if(mt) mt.click(); }
-          else { toast("沒有新的足跡可加入（可能已加過，或景點沒有座標）"); }
-        });
+        if(t.done){
+          completeTrip(t).then(function(added){ toast(added>0 ? ("已同步 "+added+" 個新足跡 👣") : "沒有新的足跡可加入"); });
+          return;
+        }
+        if(b.dataset.armed==="1"){
+          b.dataset.armed="";
+          completeTrip(t).then(function(added){ toast(added>0 ? ("完成！已加入 "+added+" 個足跡，可到足跡地圖看 👣") : "已標記完成這趟"); });
+        } else {
+          b.dataset.armed="1";
+          b.textContent="⚠️ 再點一次確認完成";
+          setTimeout(function(){ if(b&&b.dataset.armed==="1"){ b.dataset.armed=""; b.textContent="✓ 我們完成這趟旅行了，加進足跡"; } },3000);
+        }
+      });
+    });
+    el.querySelectorAll('[data-undone]').forEach(function(b){
+      b.addEventListener("click",function(){
+        if(b.dataset.armed==="1"){ b.dataset.armed=""; uncompleteTrip(t); }
+        else {
+          b.dataset.armed="1";
+          b.textContent="⚠️ 再點一次確認還原（會移除這趟自動足跡）";
+          setTimeout(function(){ if(b&&b.dataset.armed==="1"){ b.dataset.armed=""; b.textContent="↩ 取消完成（還原成進行中）"; } },4000);
+        }
       });
     });
     el.querySelectorAll('[data-export]').forEach(function(b){ b.addEventListener("click",function(){ exportTripImage(t); }); });
@@ -1091,6 +1381,15 @@
     renderAll();
     return added;
   }
+  async function uncompleteTrip(trip){
+    var before=footprints.length;
+    footprints=footprints.filter(function(f){return f.fromTrip!==trip.id;});
+    var removed=before-footprints.length;
+    if(removed) await store.set("footprints", JSON.stringify(footprints));
+    trip.done=false; await saveTrips();
+    renderAll();
+    toast("已還原為進行中"+(removed?("，移除 "+removed+" 個自動足跡"):""));
+  }
   var toastTimer;
   function toast(msg){ var el=$("toast"); if(!el) return; el.textContent=msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){el.classList.remove("show");},2800); }
   function fpToMemory(id){
@@ -1109,8 +1408,8 @@
     var base="https://www.google.com/maps/dir/?api=1";
     var u;
     if(name && placeId){ u=base+"&destination="+encodeURIComponent(name)+"&destination_place_id="+encodeURIComponent(placeId); }
-    else if(name){ u=base+"&destination="+encodeURIComponent(name); }
     else if(lat!=null&&lat!==""&&lng!=null&&lng!==""){ u=base+"&destination="+lat+","+lng; }
+    else if(name){ u=base+"&destination="+encodeURIComponent(name); }
     else { u=base; }
     window.open(u,"_blank");
   };
@@ -1488,6 +1787,7 @@
     $("stopWish").innerHTML=opts; $("stopWish").value="";
     $("stopName").value=ex?(ex.name||""):""; $("stopCountry").value=ex?(ex.country||""):""; $("stopRegion").value=ex?(ex.region||""):""; $("stopNote").value=ex?(ex.note||""):"";
     $("stopSave").textContent = ex ? "儲存修改" : "加進行程";
+    if($("stopResults")) $("stopResults").innerHTML=""; initStopAutocomplete();
     $("stopOverlay").classList.add("show");
   }
   $("stopWish").addEventListener("change",function(){
@@ -1495,6 +1795,48 @@
     if(w){ $("stopName").value=w.title||""; $("stopCountry").value=w.country||""; $("stopRegion").value=w.region||""; if(w.note&&!$("stopNote").value)$("stopNote").value=w.note;
       stopPickCoords=(w.lat!=null)?{lat:w.lat,lng:w.lng}:null; stopPickPlaceId=w.placeId||""; }
   });
+
+  /* ---------- 加景點：Google 地點搜尋（跟想去清單同一套） ---------- */
+  var sReadySvc=null, sPlacesSvc=null, stopSearchTimer=null;
+  function initStopAutocomplete(){
+    if(!window.gmReady || !window.google || !google.maps.places) return;
+    if(!sReadySvc){ try{ sReadySvc=new google.maps.places.AutocompleteService(); sPlacesSvc=new google.maps.places.PlacesService(document.createElement("div")); }catch(e){ } }
+  }
+  function onStopType(){
+    var q=$("stopName").value.trim();
+    clearTimeout(stopSearchTimer);
+    if(!sReadySvc) initStopAutocomplete();
+    if(!sReadySvc || q.length<2){ if($("stopResults")) $("stopResults").innerHTML=""; return; }
+    stopSearchTimer=setTimeout(function(){
+      sReadySvc.getPlacePredictions({input:q, language:"zh-TW"}, function(preds,status){
+        if(status!==google.maps.places.PlacesServiceStatus.OK || !preds || !preds.length){ $("stopResults").innerHTML=""; return; }
+        $("stopResults").innerHTML=preds.slice(0,5).map(function(p){
+          var main=(p.structured_formatting&&p.structured_formatting.main_text)||p.description;
+          return '<div class="geo-item" data-pid="'+p.place_id+'"><b>'+esc(main)+'</b><small>'+esc(p.description)+'</small></div>';
+        }).join("");
+        $("stopResults").querySelectorAll("[data-pid]").forEach(function(it){ it.addEventListener("click",function(){ pickStopPlace(it.getAttribute("data-pid")); }); });
+      });
+    },350);
+  }
+  function pickStopPlace(pid){
+    if(!sPlacesSvc) return;
+    $("stopResults").innerHTML='<div class="geo-msg">讀取地點中…</div>';
+    sPlacesSvc.getDetails({placeId:pid, fields:["name","geometry","address_components"]}, function(place,status){
+      if(status!==google.maps.places.PlacesServiceStatus.OK || !place || !place.geometry){ $("stopResults").innerHTML='<div class="geo-msg">讀取失敗，可手動輸入 🙏</div>'; return; }
+      var country="", region="";
+      (place.address_components||[]).forEach(function(c){
+        if(c.types.indexOf("country")>=0) country=c.long_name;
+        if(!region && (c.types.indexOf("locality")>=0 || c.types.indexOf("administrative_area_level_1")>=0)) region=c.long_name;
+      });
+      $("stopName").value=place.name||"";
+      if(country) $("stopCountry").value=country;
+      if(region) $("stopRegion").value=region;
+      stopPickCoords={lat:place.geometry.location.lat(), lng:place.geometry.location.lng()};
+      stopPickPlaceId=pid;
+      $("stopResults").innerHTML='<div class="geo-msg">✓ 已帶入座標：'+esc(place.name||"")+'</div>';
+    });
+  }
+  if($("stopName")) $("stopName").addEventListener("input", onStopType);
   $("etClear").addEventListener("click",function(){ $("etStart").value=""; $("etEnd").value=""; });
   $("etSave").addEventListener("click",async function(){
     var t=curTrip(); if(!t||!editingTimeId){ $("timeOverlay").classList.remove("show"); return; }
@@ -1560,17 +1902,224 @@
     $(o).addEventListener("click",function(ev){ if(ev.target===$(o)) $(o).classList.remove("show"); });
   });
 
-  document.querySelectorAll(".tab").forEach(function(t){
-    t.addEventListener("click",function(){
-      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
-      document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
-      t.classList.add("active");
-      var id=t.getAttribute("data-tab");
-      $(id==="map"?"map-panel":id).classList.add("active");
-      if(id==="map"){ initMainMap(); setTimeout(function(){ if(mapMain){ google.maps.event.trigger(mapMain,"resize"); refreshMap(); } },180); }
-      if(id==="wish"){ setTimeout(function(){ refreshWishMap(); },180); }
-    });
+  function activateTab(id){
+    document.querySelectorAll(".navi[data-tab]").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-tab")===id); });
+    document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
+    $(id==="map"?"map-panel":id).classList.add("active");
+    var lbl={itinerary:"行程",timeline:"旅行回顧",map:"足跡地圖",wish:"想去清單"}[id];
+    var nt=$("navTitle"); if(nt&&lbl) nt.textContent=lbl;
+    if(id==="map"){ initMainMap(); setTimeout(function(){ if(mapMain){ google.maps.event.trigger(mapMain,"resize"); refreshMap(); } },180); }
+    if(id==="wish"){ setTimeout(function(){ refreshWishMap(); },180); }
+  }
+  document.querySelectorAll(".navi[data-tab]").forEach(function(t){
+    t.addEventListener("click",function(){ activateTab(t.getAttribute("data-tab")); closeDrawer(); });
   });
+  function openDrawer(){ var d=$("navDrawer"),sc=$("navScrim"); if(d)d.classList.add("open"); if(sc)sc.classList.add("open"); }
+  function closeDrawer(){ var d=$("navDrawer"),sc=$("navScrim"); if(d)d.classList.remove("open"); if(sc)sc.classList.remove("open"); }
+  (function(){
+    var b=$("burger"); if(b)b.addEventListener("click",openDrawer);
+    var sc=$("navScrim"); if(sc)sc.addEventListener("click",closeDrawer);
+    var pu=$("naviPush"); if(pu)pu.addEventListener("click",function(){ closeDrawer(); window.enablePush&&window.enablePush(); });
+    var rm=$("naviReminders"); if(rm)rm.addEventListener("click",function(){ closeDrawer(); window.__openReminders&&window.__openReminders(); });
+    var ex=$("naviExpenses"); if(ex)ex.addEventListener("click",function(){ closeDrawer(); window.__openExpenses&&window.__openExpenses(); });
+    var m=$("naviMembers"); if(m)m.addEventListener("click",function(){ closeDrawer(); window.__openMembers&&window.__openMembers(); });
+    var tr=$("naviTrash"); if(tr)tr.addEventListener("click",function(){ closeDrawer(); window.__openTrash&&window.__openTrash(); });
+    var lo=$("naviLogout"); if(lo)lo.addEventListener("click",function(){ window.fbAuth&&window.fbAuth.signOut(); });
+  })();
+
+  /* ---------- 提醒（手動新增 + 即將到來；自動 15 分鐘由雲端排程處理） ---------- */
+  var REM_CATS=[["✈️","出發"],["🎟","購票"],["🍽","訂位"],["🎒","打包"],["🔔","自訂"]];
+  var remFormCat="出發";
+  function remIcon(c){var f=REM_CATS.find(function(x){return x[1]===c;});return f?f[0]:"🔔";}
+  function remP(n){return ("0"+n).slice(-2);}
+  function remFmt(at){var x=new Date(at);return x.getFullYear()+"."+remP(x.getMonth()+1)+"."+remP(x.getDate())+" "+remP(x.getHours())+":"+remP(x.getMinutes());}
+  function remWhen(at){var now=Date.now(),day=86400000;var t0=new Date();t0.setHours(0,0,0,0);var d1=new Date(at),d0=new Date(at);d0.setHours(0,0,0,0);var days=Math.round((d0-t0)/day);var hm=remP(d1.getHours())+":"+remP(d1.getMinutes());if(at<now-60000)return{t:"已過期",c:"past"};if(days<=0)return{t:"今天 "+hm,c:"today"};if(days===1)return{t:"明天 "+hm,c:"soon"};if(days<=7)return{t:days+" 天後",c:"soon"};return{t:(d1.getMonth()+1)+"/"+d1.getDate(),c:""};}
+  async function remLoad(){ try{ var raw=await window.cloudStore.get("reminders"); return raw?JSON.parse(raw):[]; }catch(e){ return []; } }
+  async function remSave(list){ await window.cloudStore.set("reminders", JSON.stringify(list)); }
+  function buildRemForm(){
+    $("remCats").innerHTML=REM_CATS.map(function(c){return '<span class="rem-cat'+(remFormCat===c[1]?" on":"")+'" data-rc="'+c[1]+'">'+c[0]+' '+c[1]+'</span>';}).join("");
+    $("remCats").querySelectorAll("[data-rc]").forEach(function(el){el.onclick=function(){remFormCat=el.dataset.rc;buildRemForm();};});
+  }
+  async function remRender(){
+    var list=await remLoad();
+    var active=list.filter(function(r){return !r.done;}).sort(function(a,b){return a.at-b.at;});
+    var next=active.filter(function(r){return r.at>=Date.now()-60000;})[0];
+    $("remBanner").innerHTML = next
+      ? '<div class="rb-ic">'+remIcon(next.cat)+'</div><div><div class="rb-l">下一個提醒 · '+remWhen(next.at).t+'</div><div class="rb-n">'+esc(next.title)+'</div><div class="rb-w">'+remFmt(next.at)+'</div></div>'
+      : '<div class="rb-ic">✓</div><div><div class="rb-n">目前沒有待辦提醒</div><div class="rb-w">在下面新增一筆</div></div>';
+    var all=list.slice().sort(function(a,b){return (a.done-b.done)||(a.at-b.at);});
+    $("remList").innerHTML = all.length ? all.map(function(r){var w=remWhen(r.at);
+      return '<div class="rem-row'+(r.done?" done":"")+'"><button class="rem-chk" data-done="'+r.id+'">✓</button><div class="rem-ic">'+remIcon(r.cat)+'</div><div class="rem-mid"><div class="rem-ti">'+esc(r.title)+'</div><div class="rem-sub">'+esc(r.cat)+' · '+remFmt(r.at)+'</div></div><div class="rem-when '+w.c+'">'+w.t+'</div><button class="rem-x" data-del="'+r.id+'">✕</button></div>';
+    }).join("") : '<div class="rem-empty">還沒有提醒</div>';
+    $("remList").querySelectorAll("[data-done]").forEach(function(b){b.onclick=async function(){var l=await remLoad();var r=l.find(function(x){return x.id===b.dataset.done;});if(r){r.done=!r.done;await remSave(l);await remRender();}};});
+    $("remList").querySelectorAll("[data-del]").forEach(function(b){b.onclick=async function(){var l=await remLoad();l=l.filter(function(x){return x.id!==b.dataset.del;});await remSave(l);await remRender();};});
+  }
+  var TZ_LIST=[["Asia/Taipei","台灣"],["Asia/Tokyo","日本"],["Asia/Seoul","韓國"],["Asia/Shanghai","中國"],["Asia/Hong_Kong","香港"],["Asia/Bangkok","泰國／越南"],["Asia/Singapore","新加坡"],["Europe/Helsinki","芬蘭"],["Europe/Oslo","挪威／瑞典／丹麥"],["Europe/London","英國／葡萄牙"],["Europe/Paris","法／德／西／義（中歐）"],["America/New_York","美東"],["America/Los_Angeles","美西"],["Australia/Sydney","雪梨"]];
+  function deviceTz(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Taipei"; }catch(e){ return "Asia/Taipei"; } }
+  async function buildTzSelect(){
+    var cur=null; try{ cur=await window.cloudStore.get("reminder_tz"); }catch(e){}
+    if(!cur) cur=deviceTz();
+    var list=TZ_LIST.slice();
+    if(!list.some(function(x){return x[0]===cur;})) list.unshift([cur, cur+"（你目前的裝置）"]);
+    var sel=$("remTz"); if(!sel) return;
+    sel.innerHTML=list.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===cur?" selected":"")+'>'+t[1]+'（'+t[0]+'）</option>';}).join("");
+    sel.onchange=async function(){ try{ await window.cloudStore.set("reminder_tz", sel.value); $("remMsg").textContent="時區已設定："+sel.value; }catch(e){} };
+    // 首次沒存過就把預設寫進去，雲端才有依據
+    try{ var saved=await window.cloudStore.get("reminder_tz"); if(!saved) await window.cloudStore.set("reminder_tz", cur); }catch(e){}
+  }
+  window.__openReminders=async function(){
+    $("reminderModal").style.display="flex"; buildRemForm(); await buildTzSelect();
+    var t=new Date(); t.setDate(t.getDate()+1); $("remDate").value=t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2);
+    if(!$("remTime").value) $("remTime").value="09:00";
+    await remRender();
+  };
+  (function(){
+    var c=$("remClose"); if(c)c.onclick=function(){$("reminderModal").style.display="none";};
+    var mm=$("reminderModal"); if(mm)mm.onclick=function(e){ if(e.target===mm) mm.style.display="none"; };
+    var add=$("remAdd"); if(add)add.onclick=async function(){
+      var title=($("remTitle").value||"").trim(), dt=$("remDate").value, tm=$("remTime").value||"09:00";
+      if(!title){$("remMsg").textContent="先填提醒內容";return;}
+      if(!dt){$("remMsg").textContent="選一個日期";return;}
+      var at=new Date(dt+"T"+tm+":00").getTime();
+      var l=await remLoad(); l.push({id:"rm"+Date.now(),title:title,cat:remFormCat,at:at,done:false});
+      await remSave(l); $("remTitle").value=""; $("remMsg").textContent="已加入 ✓"; await remRender();
+    };
+  })();
+
+  /* ---------- 分帳（以群組為單位、多幣別、平分/比例/指定金額） ---------- */
+  var EXP_CATS=[["🍜","食"],["🚄","交通"],["🏡","住宿"],["🎟","票券"],["🛍","購物"],["✦","其他"]];
+  var CUR_LIST=["TWD","EUR","NOK","USD","JPY"];
+  var CUR_SYM={TWD:"NT$",EUR:"€",NOK:"kr",USD:"US$",JPY:"¥"};
+  var exUnits=[];
+  var exState={cat:"食",currency:"TWD",payer:null,among:{},method:"equal",ratios:{},exacts:{}};
+  function exLedgerKey(){ var t=curTrip(); return t? ("ledger:"+t.id) : null; }
+  function exDefault(){ return {main:"TWD",rates:{EUR:35,NOK:3,USD:31,JPY:0.22},expenses:[]}; }
+  async function exLoad(){
+    var k=exLedgerKey(); if(!k) return null;
+    try{ var raw=await window.cloudStore.get(k); var l=raw?JSON.parse(raw):null; if(!l)l=exDefault();
+      if(!l.rates)l.rates=exDefault().rates; if(!l.main)l.main="TWD"; if(!l.expenses)l.expenses=[]; return l;
+    }catch(e){ return exDefault(); }
+  }
+  async function exSave(l){ var k=exLedgerKey(); if(k) await window.cloudStore.set(k, JSON.stringify(l)); }
+  function exRate(l,c){ if(c===l.main) return 1; var r=parseFloat(l.rates[c]); return (r>0)?r:1; }
+  function exToMain(l,a,c){ return (parseFloat(a)||0)*exRate(l,c); }
+  function exMoney(n){ return "NT$ "+Math.round(n).toLocaleString(); }
+  function exIcon(c){ var f=EXP_CATS.find(function(x){return x[1]===c;}); return f?f[0]:"✦"; }
+  function exShares(l,e){ var out={}; var among=(e.among||[]); if(!among.length) return out;
+    var amtMain=exToMain(l,e.amount,e.currency);
+    if(e.splitType==="exact"){ among.forEach(function(g){ out[g]=exToMain(l,(e.exacts&&e.exacts[g])||0,e.currency); }); }
+    else if(e.splitType==="ratio"){ var sum=0; among.forEach(function(g){ sum+=Math.max(0,(e.ratios&&e.ratios[g])||0); });
+      if(sum<=0) among.forEach(function(g){ out[g]=amtMain/among.length; });
+      else among.forEach(function(g){ out[g]=amtMain*Math.max(0,(e.ratios&&e.ratios[g])||0)/sum; }); }
+    else among.forEach(function(g){ out[g]=amtMain/among.length; });
+    return out; }
+  function exNets(l,units){ var net={}; units.forEach(function(g){net[g]=0;});
+    (l.expenses||[]).forEach(function(e){ if(net[e.payer]==null)net[e.payer]=0; net[e.payer]+=exToMain(l,e.amount,e.currency);
+      var sh=exShares(l,e); Object.keys(sh).forEach(function(g){ if(net[g]==null)net[g]=0; net[g]-=sh[g]; }); });
+    return net; }
+  function exSettle(net){ var cred=[],debt=[]; Object.keys(net).forEach(function(g){ var v=Math.round(net[g]); if(v>0)cred.push({g:g,v:v}); else if(v<0)debt.push({g:g,v:-v}); });
+    cred.sort(function(a,b){return b.v-a.v;}); debt.sort(function(a,b){return b.v-a.v;});
+    var tx=[],i=0,j=0; while(i<debt.length&&j<cred.length){ var pay=Math.min(debt[i].v,cred[j].v); if(pay>0)tx.push({from:debt[i].g,to:cred[j].g,amt:pay}); debt[i].v-=pay; cred[j].v-=pay; if(debt[i].v<=0)i++; if(cred[j].v<=0)j++; } return tx; }
+
+  var exMode="group";
+  async function exReloadUnits(){
+    if(exMode==="person") exUnits = await (window.__loadPeople? window.__loadPeople() : Promise.resolve([]));
+    else exUnits = await (window.__loadGroups? window.__loadGroups() : Promise.resolve([]));
+    if(!exUnits.length) exUnits=["我"];
+  }
+  function renderModeToggle(){
+    var el=$("exMode"); if(!el) return;
+    el.innerHTML='<span class="ex-modebtn'+(exMode==="group"?" on":"")+'" data-mode="group">👪 群組分</span><span class="ex-modebtn'+(exMode==="person"?" on":"")+'" data-mode="person">🧍 個人分</span>';
+    el.querySelectorAll("[data-mode]").forEach(function(b){ b.onclick=async function(){ if(b.dataset.mode===exMode)return; exMode=b.dataset.mode; var l=await exLoad(); if(l){ l.mode=exMode; await exSave(l); } await exReloadUnits(); exState.among={}; exUnits.forEach(function(g){exState.among[g]=true;}); exState.payer=exUnits[0]; exState.ratios={}; exState.exacts={}; renderModeToggle(); await exRenderAll(); exBuildForm(); }; });
+  }
+  window.__openExpenses=async function(){
+    var t=curTrip();
+    $("expTripName").textContent = t? ("· "+t.name) : "（先建立/選擇一個旅程）";
+    var l=await exLoad(); exMode=(l&&l.mode==="person")?"person":"group";
+    await exReloadUnits();
+    exState.among={}; exUnits.forEach(function(g){exState.among[g]=true;});
+    exState.payer=exUnits[0]; exState.method="equal"; exState.currency="TWD"; exState.cat="食"; exState.ratios={}; exState.exacts={};
+    $("expenseModal").style.display="flex";
+    renderModeToggle();
+    await exRenderAll(); exBuildForm();
+  };
+  async function exRenderAll(){
+    var l=await exLoad(); if(!l){ $("expBody").innerHTML='<div class="ex-empty">請先建立或選擇一個旅程</div>'; $("exRates").innerHTML=""; return; }
+    $("exRates").innerHTML = CUR_LIST.filter(function(c){return c!==l.main;}).map(function(c){
+      return '<label class="ex-rate"><span>1 '+c+' =</span><input type="number" step="0.01" data-rate="'+c+'" value="'+(l.rates[c]!=null?l.rates[c]:"")+'"><span>'+l.main+'</span></label>';
+    }).join("");
+    $("exRates").querySelectorAll("[data-rate]").forEach(function(inp){ inp.onchange=async function(){ var ll=await exLoad(); ll.rates[inp.dataset.rate]=parseFloat(inp.value)||0; await exSave(ll); exRenderAll(); }; });
+    var total=(l.expenses||[]).reduce(function(s,e){return s+exToMain(l,e.amount,e.currency);},0);
+    var refNames={}; (l.expenses||[]).forEach(function(e){ if(e.payer)refNames[e.payer]=1; (e.among||[]).forEach(function(g){refNames[g]=1;}); });
+    var unitsAll=exUnits.slice(); Object.keys(refNames).forEach(function(g){ if(unitsAll.indexOf(g)<0) unitsAll.push(g); });
+    var net=exNets(l,unitsAll);
+    var netHtml=Object.keys(net).map(function(g){ var v=Math.round(net[g]); var cls=v>0?"pos":(v<0?"neg":"zero"); var lab=v>0?"應收":(v<0?"應付":"結清"); var val=v===0?"—":(v>0?"+":"−")+"NT$"+Math.abs(v).toLocaleString();
+      return '<div class="ex-mrow"><span class="ex-g">'+esc(g)+'</span><span class="ex-bal '+cls+'"><small>'+lab+'</small>'+val+'</span></div>'; }).join("");
+    var tx=exSettle(net);
+    var settleHtml = tx.length? tx.map(function(t){ return '<div class="ex-srow"><span>'+esc(t.from)+'</span><span class="ex-arr">→</span><span>'+esc(t.to)+'</span><span class="ex-amt">NT$ '+t.amt.toLocaleString()+'</span></div>'; }).join("") : '<div class="ex-done">✓ 大家都結清了</div>';
+    var listHtml=(l.expenses||[]).slice().reverse().map(function(e){ var amtMain=exToMain(l,e.amount,e.currency);
+      var curTxt=(e.currency!==l.main)?((CUR_SYM[e.currency]||e.currency)+" "+e.amount+"　≈ "+exMoney(amtMain)):exMoney(amtMain);
+      var amongTxt=(e.among&&e.among.length===exUnits.length)?"全體平分":("分 "+(e.among||[]).join("、"));
+      var methodTxt={equal:"平均",ratio:"比例",exact:"指定"}[e.splitType]||"平均";
+      return '<div class="ex-erow"><div class="ex-ic">'+exIcon(e.cat)+'</div><div class="ex-mid"><div class="ex-ti">'+esc(e.title)+'</div><div class="ex-sub">'+esc(e.payer)+' 付 · '+methodTxt+' · '+esc(amongTxt)+'</div></div><div class="ex-rt"><div class="ex-a">'+esc(curTxt)+'</div></div><button class="ex-x" data-exdel="'+e.id+'">✕</button></div>'; }).join("") || '<div class="ex-empty">還沒有支出</div>';
+    $("expBody").innerHTML =
+      '<div class="ex-ov"><div class="ex-ovl">本趟共同支出</div><div class="ex-ovv">'+exMoney(total)+'</div><div class="ex-ovm">'+exUnits.length+(exMode==="person"?' 人 · ':' 組 · ')+(l.expenses||[]).length+' 筆</div></div>'+
+      '<div class="ex-mlist">'+netHtml+'</div>'+
+      '<div class="ex-h">結算建議</div><div class="ex-settle">'+settleHtml+'</div>'+
+      '<div class="ex-h">支出明細</div><div class="ex-elist">'+listHtml+'</div>';
+    $("expBody").querySelectorAll("[data-exdel]").forEach(function(b){ b.onclick=async function(){ var ll=await exLoad(); ll.expenses=(ll.expenses||[]).filter(function(x){return x.id!==b.dataset.exdel;}); await exSave(ll); exRenderAll(); }; });
+  }
+  function exBuildForm(){
+    $("exCats").innerHTML=EXP_CATS.map(function(c){return '<span class="ex-cat'+(exState.cat===c[1]?" on":"")+'" data-ec="'+c[1]+'">'+c[0]+' '+c[1]+'</span>';}).join("");
+    $("exCats").querySelectorAll("[data-ec]").forEach(function(el){el.onclick=function(){exState.cat=el.dataset.ec;exBuildForm();};});
+    $("exCur").innerHTML=CUR_LIST.map(function(c){return '<option value="'+c+'"'+(exState.currency===c?" selected":"")+'>'+c+'</option>';}).join("");
+    $("exCur").onchange=function(){exState.currency=$("exCur").value;exBuildForm();};
+    $("exPayer").innerHTML=exUnits.map(function(g){return '<option value="'+esc(g)+'"'+(exState.payer===g?" selected":"")+'>'+esc(g)+'</option>';}).join("");
+    $("exPayer").onchange=function(){exState.payer=$("exPayer").value;};
+    $("exAmong").innerHTML=exUnits.map(function(g){ var on=exState.among[g]!==false; return '<span class="ex-among-chip'+(on?" on":"")+'" data-ea="'+esc(g)+'">'+esc(g)+'</span>'; }).join("");
+    $("exAmong").querySelectorAll("[data-ea]").forEach(function(el){el.onclick=function(){var g=el.dataset.ea; exState.among[g]=(exState.among[g]===false); exBuildForm();};});
+    $("exMethods").innerHTML=[["equal","平均分"],["ratio","指定比例"],["exact","指定金額"]].map(function(m){return '<span class="ex-method'+(exState.method===m[0]?" on":"")+'" data-em="'+m[0]+'">'+m[1]+'</span>';}).join("");
+    $("exMethods").querySelectorAll("[data-em]").forEach(function(el){el.onclick=function(){exState.method=el.dataset.em;exBuildForm();};});
+    var amongList=exUnits.filter(function(g){return exState.among[g]!==false;});
+    var extra="";
+    if(exState.method==="ratio"){ var _n=amongList.length||1; extra='<div class="ex-split-in" id="ratioBox">'+amongList.map(function(g){ if(exState.ratios[g]==null)exState.ratios[g]=Math.round(100/_n); return '<label><span>'+esc(g)+'</span><span class="ex-ratcell"><input type="number" step="1" min="0" data-ratio="'+esc(g)+'" value="'+exState.ratios[g]+'"><span class="ex-pct">%</span><span class="ex-eq" data-eq="'+esc(g)+'">≈ NT$ 0</span></span></label>';}).join("")+'<div class="ex-ratsum" id="ratioSum"></div></div>'; }
+    else if(exState.method==="exact"){ extra='<div class="ex-split-in">'+amongList.map(function(g){return '<label><span>'+esc(g)+'</span><input type="number" step="0.01" min="0" data-exact="'+esc(g)+'" placeholder="'+exState.currency+'" value="'+((exState.exacts&&exState.exacts[g])!=null?exState.exacts[g]:"")+'"></label>';}).join("")+'</div>'; }
+    $("exSplitExtra").innerHTML=extra;
+    $("exSplitExtra").querySelectorAll("[data-ratio]").forEach(function(inp){inp.oninput=function(){exState.ratios[inp.dataset.ratio]=parseFloat(inp.value)||0;exUpdateRatioPreview();};});
+    $("exSplitExtra").querySelectorAll("[data-exact]").forEach(function(inp){inp.onchange=function(){exState.exacts[inp.dataset.exact]=parseFloat(inp.value)||0;};});
+    exUpdateHint(); exUpdateRatioPreview();
+  }
+  function exUpdateHint(){ var amt=parseFloat($("exAmount").value)||0; var among=exUnits.filter(function(g){return exState.among[g]!==false;}); var h=$("exHint");
+    if(amt>0&&among.length&&exState.method==="equal"){ h.textContent="平均分 "+among.length+" 組，每組 "+(CUR_SYM[exState.currency]||exState.currency)+" "+(amt/among.length).toFixed(2); } else h.textContent=""; }
+  function exUpdateRatioPreview(){ var box=$("ratioBox"); if(!box) return; var l=null;
+    var amt=parseFloat($("exAmount").value)||0; var amtMain=amt*( (exState.currency==="TWD")?1:0 );
+    // 用目前匯率估算（讀畫面上的匯率輸入）
+    var rate=1; if(exState.currency!=="TWD"){ var ri=document.querySelector('[data-rate="'+exState.currency+'"]'); rate=ri?(parseFloat(ri.value)||1):1; }
+    amtMain=amt*rate;
+    var inputs=box.querySelectorAll("[data-ratio]"); var sum=0, arr=[];
+    inputs.forEach(function(inp){ var v=Math.max(0,parseFloat(inp.value)||0); arr.push({g:inp.dataset.ratio,v:v}); sum+=v; });
+    arr.forEach(function(o){ var share= sum>0? amtMain*o.v/sum : (arr.length? amtMain/arr.length:0); var eq=box.querySelector('[data-eq="'+(window.CSS&&CSS.escape?CSS.escape(o.g):o.g)+'"]'); if(eq) eq.textContent="≈ NT$ "+Math.round(share).toLocaleString(); });
+    var sumEl=$("ratioSum"); if(sumEl) sumEl.textContent="目前總和 "+Math.round(sum)+"%（不用湊 100，系統照相對比例分好分滿）"; }
+  (function(){
+    var c=$("exClose"); if(c)c.onclick=function(){$("expenseModal").style.display="none";};
+    var mm=$("expenseModal"); if(mm)mm.onclick=function(e){ if(e.target===mm) mm.style.display="none"; };
+    var amt=$("exAmount"); if(amt)amt.addEventListener("input",function(){exUpdateHint();exUpdateRatioPreview();});
+    var rt=$("exRatesToggle"); if(rt)rt.onclick=function(){ $("exRatesWrap").classList.toggle("open"); };
+    var add=$("exAdd"); if(add)add.onclick=async function(){
+      if(!curTrip()){ $("exMsg").textContent="請先建立/選擇旅程"; return; }
+      var title=($("exTitle").value||"").trim(); var amount=parseFloat($("exAmount").value)||0;
+      if(!title) title="未命名支出";
+      if(amount<=0){ $("exMsg").textContent="請輸入金額"; return; }
+      var among=exUnits.filter(function(g){return exState.among[g]!==false;});
+      if(!among.length){ $("exMsg").textContent="至少選一組分攤"; return; }
+      var e={ id:"ex"+Date.now(), title:title, amount:amount, currency:exState.currency, payer:exState.payer||exUnits[0], cat:exState.cat, splitType:exState.method, among:among, ratios:{}, exacts:{}, ts:Date.now() };
+      if(exState.method==="ratio") among.forEach(function(g){ e.ratios[g]=(exState.ratios[g]!=null?exState.ratios[g]:1); });
+      if(exState.method==="exact") among.forEach(function(g){ e.exacts[g]=(exState.exacts[g]!=null?exState.exacts[g]:0); });
+      var l=await exLoad(); l.expenses.push(e); await exSave(l);
+      $("exTitle").value=""; $("exAmount").value=""; $("exMsg").textContent="已加入 ✓"; exState.ratios={}; exState.exacts={};
+      await exRenderAll(); exBuildForm();
+    };
+  })();
 
   /* ---------- memory modal ---------- */
   var photoData=null;
@@ -1581,7 +2130,7 @@
     pickLat=(prefill.lat!=null)?prefill.lat:null; pickLng=(prefill.lng!=null)?prefill.lng:null;
     $("memModalTitle").textContent=prefill.fpId?"補上這個足跡的回憶":"新增一段回憶";
     $("mTitle").value=prefill.title||"";
-    $("mDate").value=prefill.date||new Date().toISOString().slice(0,10);
+    var _mn=new Date(); $("mDate").value=prefill.date||(_mn.getFullYear()+"-"+("0"+(_mn.getMonth()+1)).slice(-2)+"-"+("0"+_mn.getDate()).slice(-2));
     $("mPlace").value=prefill.place||""; $("mNote").value=prefill.note||"";
     $("mPreview").style.display="none";
     $("coordHint").textContent=(pickLat!=null)?"已標記位置 ✓":"尚未標記位置";
@@ -1759,19 +2308,34 @@
   #logoutBtn{display:none}
   #membersBtn{display:none}
   #memberModal{position:fixed;inset:0;z-index:5200;display:none;align-items:center;justify-content:center;padding:22px;background:var(--overlay)}
-  #memberModal .mm-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:380px;padding:22px;max-height:80vh;overflow:auto}
-  #memberModal h3{font-family:var(--hand);font-size:22px;margin:0 0 4px;color:var(--ink)}
-  #memberModal .mm-sub{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-soft);margin-bottom:16px}
-  #memberModal .mm-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+  #memberModal .mm-card{background:var(--paper-2);border:1px solid var(--kraft-deep);border-radius:18px;box-shadow:var(--shadow);width:100%;max-width:460px;padding:22px;max-height:84vh;overflow:auto}
+  #memberModal h3{font-family:var(--hand);font-size:24px;margin:0 0 4px;color:var(--ink)}
+  #memberModal .mm-sub{font-family:var(--body);font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6}
+  #memberModal .mm-profile{background:var(--accent-tint);border:1px solid rgba(142,94,68,.18);border-radius:16px;padding:14px;margin-bottom:16px}
+  #memberModal .mm-profile-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-weight:700;color:var(--terra-deep);font-size:14px}
+  #memberModal .mm-basic{display:grid;grid-template-columns:1fr;gap:8px}
+  #memberModal .mm-basic small{display:block;font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:2px;letter-spacing:.04em}
+  #memberModal .mm-basic b{display:block;font-size:14px;color:var(--ink);font-weight:700;word-break:break-word}
+  #memberModal .mm-basic input{width:100%;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--paper-2);color:var(--ink)}
+  #memberModal .mm-basic input:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px rgba(142,94,68,.14)}
+  #memberModal .mm-basic input:disabled{opacity:.72;background:var(--surface-3);cursor:not-allowed}
+  #memberModal .mm-note{font-size:12px;color:var(--ink-soft);line-height:1.55;margin-top:8px}
+  #memberModal .mm-profile-actions{margin-top:10px}
+  #memberModal .mm-profile-actions button{width:100%;border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
+  #memberModal .mm-section-title{font-size:13px;font-weight:700;color:var(--ink-soft);margin:10px 0 4px}
+  #memberModal .mm-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line-soft)}
   #memberModal .mm-row:first-of-type{border-top:none}
-  #memberModal .mm-em{flex:1;font-size:13.5px;word-break:break-all;font-family:var(--mono)}
-  #memberModal .mm-tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--terra);background:var(--accent-tint);border-radius:6px;padding:2px 7px}
+  #memberModal .mm-person{flex:1;min-width:0}
+  #memberModal .mm-name{display:block;font-size:14px;font-weight:700;color:var(--ink);line-height:1.35;word-break:break-word}
+  #memberModal .mm-em{display:block;font-size:12px;word-break:break-all;font-family:var(--mono);color:var(--ink-soft);margin-top:2px}
+  #memberModal .mm-tag{font-family:var(--body);font-size:11px;color:var(--terra);background:var(--accent-tint);border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:700}
+  #memberModal .mm-tag.admin{background:var(--terra);color:var(--on-accent)}
   #memberModal .mm-x{border:none;background:none;color:var(--rose);font-size:17px;cursor:pointer;padding:0 4px;opacity:.6}
   #memberModal .mm-x:hover{opacity:1}
-  #memberModal .mm-add{display:flex;gap:8px;margin-top:16px}
-  #memberModal .mm-add input{flex:1;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--surface-3);color:var(--ink)}
+  #memberModal .mm-add{display:grid;grid-template-columns:1fr;gap:8px;margin-top:16px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:14px;padding:12px}
+  #memberModal .mm-add input{width:100%;min-width:0;border:1px solid var(--kraft-deep);border-radius:10px;padding:10px 12px;font-size:14px;font-family:var(--body);background:var(--paper-2);color:var(--ink)}
   #memberModal .mm-add input:focus{outline:none;border-color:var(--terra)}
-  #memberModal .mm-add button{border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:0 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
+  #memberModal .mm-add button{border:none;background:var(--terra);color:var(--on-accent);border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--body)}
   #memberModal .mm-msg{font-size:12.5px;color:var(--ink-soft);min-height:16px;margin-top:8px}
   #memberModal .mm-close{margin-top:16px;width:100%;border:1px solid var(--kraft-deep);background:transparent;color:var(--ink-soft);border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--body)}
   #logoutBtn::before{content:"・";margin:0 6px;color:var(--ink-soft)}
@@ -1788,37 +2352,96 @@
 
 <div id="memberModal">
   <div class="mm-card">
-    <h3>成員</h3>
-    <div class="mm-sub">可以登入這本旅程的人 · 任何成員都能邀請</div>
+    <h3>成員管理</h3>
+    <div class="mm-sub">系統管理員可新增或移除成員；成員可以自行編輯自己的名字與信箱。信箱調整後，需改用新信箱登入。</div>
+    <div class="mm-profile">
+      <div class="mm-profile-head"><span>我的基本資料</span><span class="mm-tag admin" id="mmMyRole">系統管理員</span></div>
+      <div class="mm-basic">
+        <div><small>名字</small><input id="mmMyNameInput" type="text" placeholder="名字" autocomplete="off"></div>
+        <div><small>信箱</small><input id="mmMyEmailInput" type="email" placeholder="信箱（Google email）" autocomplete="off"></div>
+      </div>
+      <div class="mm-group-row"><small>群組（分帳用・可打字新增，已建立的會出現在下拉）</small><input id="mmMyGroupInput" type="text" placeholder="例如：國家" autocomplete="off" list="mmGroupList"><datalist id="mmGroupList"></datalist></div>
+      <div class="mm-note" id="mmMyHint">信箱變更儲存後，系統會登出，請改用新信箱登入。</div>
+      <div class="mm-profile-actions"><button id="mmSaveSelf">儲存我的資料</button></div>
+    </div>
+    <div class="mm-section-title">成員清單</div>
     <div id="mmList"></div>
     <div class="mm-add">
-      <input id="mmInput" type="email" placeholder="輸入對方的 Google email" autocomplete="off">
-      <button id="mmAdd">邀請</button>
+      <input id="mmNameInput" type="text" placeholder="名字" autocomplete="off">
+      <input id="mmInput" type="email" placeholder="信箱（Google email）" autocomplete="off">
+      <button id="mmAdd">新增成員</button>
     </div>
     <div class="mm-msg" id="mmMsg"></div>
     <button class="mm-close" id="mmClose">關閉</button>
   </div>
 </div>
 
+<div id="reminderModal">
+  <div class="rem-card">
+    <h3>提醒</h3>
+    <div class="rem-cap">行程裡「有填時間」的景點會在開始前 15 分鐘自動提醒；下面可另外手動新增（發給所有成員）。</div>
+    <div class="rem-tz"><small>自動提醒時區（行程時間依這個算）</small><select id="remTz"></select></div>
+    <div class="rem-banner" id="remBanner"></div>
+    <div class="rem-lh">提醒清單</div>
+    <div id="remList"></div>
+    <div class="rem-form">
+      <div class="rem-lh2">＋ 新增提醒</div>
+      <input id="remTitle" type="text" placeholder="例如：買門票、預約餐廳、開始打包…" autocomplete="off">
+      <div class="rem-row2"><input id="remDate" type="date"><input id="remTime" type="time" value="09:00"></div>
+      <div class="rem-cats" id="remCats"></div>
+      <button id="remAdd">加入提醒</button>
+      <div class="rem-msg" id="remMsg"></div>
+    </div>
+    <button class="rem-close" id="remClose">關閉</button>
+  </div>
+</div>
+
+<div id="expenseModal">
+  <div class="ex-card">
+    <h3>分帳 <span class="ex-trip" id="expTripName"></span></h3>
+    <div class="ex-mode" id="exMode"></div>
+    <div class="ex-rates-wrap" id="exRatesWrap">
+      <div class="ex-rates-toggle" id="exRatesToggle">💱 幣別與匯率（主幣別 NT$）<span class="ex-arrow">▾</span></div>
+      <div class="ex-rates" id="exRates"></div>
+    </div>
+    <div id="expBody"></div>
+    <div class="ex-form">
+      <div class="ex-h">＋ 新增支出</div>
+      <input id="exTitle" type="text" placeholder="項目，例如：晚餐、纜車票…" autocomplete="off">
+      <div class="ex-r2"><input id="exAmount" type="number" step="0.01" placeholder="金額"><select id="exCur"></select></div>
+      <label class="ex-lb">分類</label><div class="ex-cats" id="exCats"></div>
+      <label class="ex-lb">誰付的</label><select id="exPayer"></select>
+      <label class="ex-lb">分給哪些組</label><div class="ex-among" id="exAmong"></div>
+      <label class="ex-lb">分法</label><div class="ex-methods" id="exMethods"></div>
+      <div id="exSplitExtra"></div>
+      <button id="exAdd">加入支出</button>
+      <div class="ex-hint" id="exHint"></div>
+      <div class="ex-msg" id="exMsg"></div>
+    </div>
+    <button class="ex-close" id="exClose">關閉</button>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, arrayUnion, arrayRemove, onSnapshot } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-messaging.js";
 
   /* ⬇⬇⬇ ① Firebase 設定：貼上你自己專案的設定 ⬇⬇⬇
      （Firebase 主控台 → 專案設定 → 你的應用程式 → SDK 設定與配置） */
   const firebaseConfig = {
-    apiKey: "AIzaSyD5D8JjgOSFWZCasxFn4Fh-q500zJbQmmU",
-    authDomain: "ajtravel-c7267.firebaseapp.com",
-    projectId: "ajtravel-c7267",
-    storageBucket: "ajtravel-c7267.firebasestorage.app",
-    messagingSenderId: "579993220776",
-    appId: "1:579993220776:web:7c0209c6c0667af47eb49d"
+    apiKey: "AIzaSyBmXtR9yJVrCT2eMZGh7Rv7OwO4R0V5lDk",
+    authDomain: "familie-reise.firebaseapp.com",
+    projectId: "familie-reise",
+    storageBucket: "familie-reise.firebasestorage.app",
+    messagingSenderId: "375890500526",
+    appId: "1:375890500526:web:2a96f5e85cb813021c063f"
   };
   /* ⬇⬇⬇ ② 把這裡換成「你自己」的 Google email（全部小寫）⬇⬇⬇
      你是起始擁有者，第一次登入會自動把你加進成員名單；
-     其他人由你（或任何成員）在 App 裡的「成員」按鈕邀請。 */
-  const OWNER = "換成你自己的email@gmail.com";
+     其他人由系統管理員在 App 裡的「成員管理」邀請。 */
+  const OWNER = "tcwjustin86@gmail.com";
   /* ⬆⬆⬆ 只需要改上面這兩塊，其他都不用動 ⬆⬆⬆ */
 
   const app = initializeApp(firebaseConfig);
@@ -1826,30 +2449,105 @@
   const db = getFirestore(app);
   const COL = "familydata";
   const ownerEmail = OWNER.trim().toLowerCase();
-  const membersRef = doc(db, COL, "__members__");
+  const membersRef = doc(db, COL, "members_meta");   // 註：前後雙底線是 Firestore 保留字，不能用
 
   window.cloudStore = {
     async get(k){ const s = await getDoc(doc(db, COL, k)); return s.exists() ? s.data().value : null; },
     async set(k, v){ await setDoc(doc(db, COL, k), { key: k, value: v }); return { key: k, value: v }; },
     async del(k){ await deleteDoc(doc(db, COL, k)); },
-    async list(prefix){ const qy = query(collection(db, COL), where("key", ">=", prefix), where("key", "<", prefix + "\uf8ff")); const snap = await getDocs(qy); return snap.docs.map(d => d.id); }
+    async list(prefix){ const qy = query(collection(db, COL), where("key", ">=", prefix), where("key", "<", prefix + "\uf8ff")); const snap = await getDocs(qy); return snap.docs.map(d => d.id); },
+    subscribe(k, cb){ try{ return onSnapshot(doc(db, COL, k), function(snap){ if(snap.metadata && snap.metadata.hasPendingWrites) return; cb(snap.exists() ? snap.data().value : null); }, function(){}); }catch(e){ return function(){}; } }
   };
   window.fbAuth = {
     signIn(){ return signInWithPopup(auth, new GoogleAuthProvider()); },
     signOut(){ return signOut(auth); }
   };
 
+  /* ---------- 推播通知（FCM） ---------- */
+  /* ⬇⬇⬇ 把這串換成你的 VAPID 金鑰（Firebase → 專案設定 → Cloud Messaging → Web Push certificates → 那串以 B 開頭）⬇⬇⬇ */
+  const VAPID_KEY = "BCDdMnS9mLz_NKE2-hI6dPK23312DpHItlAq8QuHGpGO5S7n-qSNeKEbkadk4VlnAx3TtxjaZ1G8kzVb352lHuU";
+  let messaging = null;
+  try { messaging = getMessaging(app); } catch(e){ }
+
+  window.enablePush = async function(){
+    try{
+      if(!("Notification" in window) || !messaging){ alert("這個裝置/瀏覽器不支援網頁通知。\niPhone 請先把網站『加到主畫面』開啟後再試。"); return; }
+      const perm = await Notification.requestPermission();
+      if(perm !== "granted"){ alert("你沒有允許通知。可到裝置/瀏覽器設定手動開啟後再試。"); return; }
+      const reg = await navigator.serviceWorker.register("firebase-messaging-sw.js");
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      if(!token){ alert("拿不到推播 token，請再試一次。"); return; }
+      const email = ((auth.currentUser && auth.currentUser.email) || "").toLowerCase();
+      try{
+        const key = "pushtoken:" + email;
+        const raw = await window.cloudStore.get(key);
+        const obj = raw ? JSON.parse(raw) : { key:key, email:email, tokens:[] };
+        if(!obj.tokens) obj.tokens = [];
+        if(obj.tokens.indexOf(token) < 0) obj.tokens.push(token);
+        obj.email = email;
+        await window.cloudStore.set(key, JSON.stringify(obj));
+      }catch(e){ console.log("save token error", e); }
+      console.log("✅ FCM token:", token);
+      window.__lastPushToken = token;
+      prompt("通知已開啟 ✅\n\n這是這台裝置的推播 token（測試用，長按全選複製）：", token);
+    }catch(e){ console.log("push error", e); alert("開啟通知失敗：" + ((e && e.message) || e)); }
+  };
+
+  try{
+    if(messaging) onMessage(messaging, function(payload){
+      const n = (payload && payload.notification) || {};
+      try{ new Notification(n.title || "提醒", { body: n.body || "", icon: "icon-192.png" }); }catch(e){}
+    });
+  }catch(e){}
+
   const gate = document.getElementById("loginGate");
   const gateMsg = document.getElementById("gateMsg");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const membersBtn = document.getElementById("membersBtn");
   let currentEmail = "";
+  let currentName = "";
 
-  async function loadAllowed(){
+  function cleanEmail(e){ return String(e || "").trim().toLowerCase(); }
+  function nameFromEmail(e){ return cleanEmail(e).split("@")[0] || "未命名成員"; }
+  function escHtml(s){ return String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  function isSystemAdmin(){ return currentEmail === ownerEmail; }
+
+  async function loadMemberDoc(){
     try{
       const s = await getDoc(membersRef);
-      return s.exists() ? (s.data().allowed || []).map(e => String(e).toLowerCase()) : [];
+      return s.exists() ? s.data() : {};
+    }catch(e){ return {}; }
+  }
+  window.__loadGroups = async function(){
+    try{
+      const d = await loadMemberDoc();
+      let allowed = (d.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      const names = d.names || {}, groups = d.groups || {};
+      const units = [];
+      allowed.forEach(function(em){
+        var g = String(groups[em]||"").trim() || String(names[em]||"").trim() || em.split("@")[0];
+        if (units.indexOf(g) < 0) units.push(g);
+      });
+      return units;
     }catch(e){ return []; }
+  };
+  window.__loadPeople = async function(){
+    try{
+      const d = await loadMemberDoc();
+      let allowed = (d.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      const names = d.names || {};
+      const people = [];
+      allowed.forEach(function(em){
+        var nm = String(names[em]||"").trim() || em.split("@")[0];
+        if (people.indexOf(nm) < 0) people.push(nm);
+      });
+      return people;
+    }catch(e){ return []; }
+  };
+
+  async function loadAllowed(){
+    const data = await loadMemberDoc();
+    return (data.allowed || []).map(cleanEmail).filter(Boolean);
   }
 
   document.getElementById("googleSignIn").onclick = () => {
@@ -1858,30 +2556,29 @@
   };
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user){ gate.style.display = "flex"; logoutBtn.style.display = "none"; membersBtn.style.display = "none"; return; }
-    currentEmail = (user.email || "").toLowerCase();
+    if (!user){ gate.style.display = "flex"; return; }
+    currentEmail = cleanEmail(user.email);
+    const fallbackName = (user.displayName || nameFromEmail(currentEmail)).trim();
     const isOwner = currentEmail === ownerEmail;
-    let allowed = await loadAllowed();
+    let memberData = await loadMemberDoc();
+    currentName = ((memberData.names || {})[currentEmail] || fallbackName).trim();
+    let allowed = (memberData.allowed || []).map(cleanEmail).filter(Boolean);
 
-    // 起始擁有者：第一次登入自動建立/加入名單
-    if (isOwner && !allowed.includes(currentEmail)){
+    // 系統管理員：第一次登入自動建立/加入名單，並記錄基本資料（名字、信箱）
+    if (isOwner){
       try{
-        const s = await getDoc(membersRef);
-        if (s.exists()) await updateDoc(membersRef, { allowed: arrayUnion(currentEmail) });
-        else await setDoc(membersRef, { allowed: [currentEmail] });
-        allowed.push(currentEmail);
+        const names = Object.assign({}, memberData.names || {});
+        names[currentEmail] = currentName || nameFromEmail(currentEmail);
+        if (!allowed.includes(currentEmail)) allowed.push(currentEmail);
+        await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
       }catch(e){}
     }
 
     if (isOwner || allowed.includes(currentEmail)){
       gate.style.display = "none";
-      logoutBtn.style.display = "block";
-      membersBtn.style.display = "";
       window.__startApp && window.__startApp();
     } else {
       gateMsg.textContent = "這個帳號還沒被邀請，請聯絡家人把你加進成員。";
-      logoutBtn.style.display = "none";
-      membersBtn.style.display = "none";
       signOut(auth);
     }
   });
@@ -1889,42 +2586,161 @@
   /* ---------- 成員管理 ---------- */
   const mModal = document.getElementById("memberModal");
   const mList  = document.getElementById("mmList");
+  const mNameInput = document.getElementById("mmNameInput");
   const mInput = document.getElementById("mmInput");
+  const mMyNameInput = document.getElementById("mmMyNameInput");
+  const mMyEmailInput = document.getElementById("mmMyEmailInput");
+  const mMyGroupInput = document.getElementById("mmMyGroupInput");
+  const mMyHint = document.getElementById("mmMyHint");
+  const mAddBox = document.querySelector("#memberModal .mm-add");
   const mMsg   = document.getElementById("mmMsg");
   const emailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
+  function setMyMemberCard(){
+    const admin = isSystemAdmin();
+    const role = admin ? "系統管理員" : "成員";
+    const name = currentName || nameFromEmail(currentEmail || ownerEmail);
+    mMyNameInput.value = name;
+    mMyEmailInput.value = currentEmail || ownerEmail;
+    mMyEmailInput.disabled = admin;
+    mMyHint.textContent = admin
+      ? "系統管理員信箱需與程式內 OWNER 設定一致；若要更換管理員信箱，請同步修改程式設定。"
+      : "信箱變更儲存後，系統會登出，請改用新信箱登入。";
+    if (mAddBox) mAddBox.style.display = "grid";   // 乙：所有成員都能邀請
+    const roleEl = document.getElementById("mmMyRole");
+    roleEl.textContent = role;
+    roleEl.classList.toggle("admin", admin);
+  }
+
   async function renderMembers(){
     mMsg.textContent = "";
-    let allowed = await loadAllowed();
+    const data = await loadMemberDoc();
+    let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+    const names = Object.assign({}, data.names || {});
+    const groupMap = Object.assign({}, data.groups || {});
     if (!allowed.length && ownerEmail) allowed = [ownerEmail];
+    if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
     mList.innerHTML = allowed.map(function(em){
       const isOwn = em === currentEmail;
-      const isOwnerEm = em === ownerEmail;
-      const tag = isOwnerEm ? '<span class="mm-tag">擁有者</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '');
-      const x = (isOwnerEm || isOwn) ? '' : '<button class="mm-x" data-rm="'+em+'" title="移除">✕</button>';
-      return '<div class="mm-row"><span class="mm-em">'+em+'</span>'+tag+x+'</div>';
+      const isAdmin = em === ownerEmail;
+      const nm = names[em] || (isOwn ? currentName : "") || nameFromEmail(em);
+      const tag = isAdmin ? '<span class="mm-tag admin">系統管理員</span>' : (isOwn ? '<span class="mm-tag">你</span>' : '<span class="mm-tag">成員</span>');
+      const x = (isSystemAdmin() && !isAdmin) ? '<button class="mm-x" data-rm="'+escHtml(em)+'" title="移除">✕</button>' : '';
+      const grp = groupMap[em] || "";
+      const grpCell = isSystemAdmin()
+        ? '<input class="mm-grp" data-grp="'+escHtml(em)+'" list="mmGroupList" value="'+escHtml(grp)+'" placeholder="群組">'
+        : (grp ? '<span class="mm-grp-tag">'+escHtml(grp)+'</span>' : '');
+      return '<div class="mm-row"><span class="mm-person"><span class="mm-name">'+escHtml(nm)+'</span><span class="mm-em">'+escHtml(em)+'</span></span>'+grpCell+tag+x+'</div>';
     }).join("");
+    const groupNames = Array.from(new Set(Object.keys(groupMap).map(function(k){return String(groupMap[k]||"").trim();}).filter(Boolean)));
+    const dl = document.getElementById("mmGroupList");
+    if (dl) dl.innerHTML = groupNames.map(function(g){return '<option value="'+escHtml(g)+'">';}).join("");
+    if (mMyGroupInput) mMyGroupInput.value = groupMap[currentEmail] || "";
+    mList.querySelectorAll("[data-grp]").forEach(function(inp){
+      inp.onchange = async function(){
+        const em = cleanEmail(inp.dataset.grp);
+        try{
+          const d2 = await loadMemberDoc();
+          const g2 = Object.assign({}, d2.groups || {});
+          const v = inp.value.trim();
+          if (v) g2[em] = v; else delete g2[em];
+          await setDoc(membersRef, { groups: g2 }, { merge: true });
+          renderMembers();
+        }catch(e){ mMsg.textContent = "群組儲存失敗，請確認你有權限。"; }
+      };
+    });
     mList.querySelectorAll("[data-rm]").forEach(function(b){
       b.onclick = async function(){
-        try{ await updateDoc(membersRef, { allowed: arrayRemove(b.dataset.rm) }); renderMembers(); }
+        const rm = cleanEmail(b.dataset.rm);
+        if (!isSystemAdmin()){ mMsg.textContent = "只有系統管理員可以移除成員。"; return; }
+        try{
+          const data = await loadMemberDoc();
+          const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean).filter(e => e !== rm);
+          const names = Object.assign({}, data.names || {});
+          const groups = Object.assign({}, data.groups || {});
+          delete names[rm]; delete groups[rm];
+          await setDoc(membersRef, { allowed: allowed, names: names, groups: groups }, { merge: true });
+          renderMembers();
+        }
         catch(e){ mMsg.textContent = "移除失敗，請確認你有權限。"; }
       };
     });
   }
-  window.__openMembers = function(){ mModal.style.display = "flex"; renderMembers(); mInput.value = ""; };
+  window.__openMembers = function(){
+    mModal.style.display = "flex";
+    setMyMemberCard();
+    renderMembers();
+    mNameInput.value = "";
+    mInput.value = "";
+  };
   document.getElementById("mmClose").onclick = function(){ mModal.style.display = "none"; };
   mModal.onclick = function(e){ if (e.target === mModal) mModal.style.display = "none"; };
-  document.getElementById("mmAdd").onclick = async function(){
-    const em = mInput.value.trim().toLowerCase();
-    if (!emailOk(em)){ mMsg.textContent = "email 格式怪怪的，再確認一下。"; return; }
-    mMsg.textContent = "邀請中…";
+
+  document.getElementById("mmSaveSelf").onclick = async function(){
+    const oldEmail = currentEmail || ownerEmail;
+    const newName = mMyNameInput.value.trim();
+    const newEmail = cleanEmail(mMyEmailInput.value);
+    if (!newName){ mMsg.textContent = "請先輸入名字。"; return; }
+    if (!emailOk(newEmail)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
+    if (oldEmail === ownerEmail && newEmail !== oldEmail){
+      mMsg.textContent = "系統管理員信箱需同步修改程式內 OWNER 設定，這裡先不開放直接更換。";
+      mMyEmailInput.value = oldEmail;
+      return;
+    }
+    mMsg.textContent = "儲存中…";
     try{
-      const s = await getDoc(membersRef);
-      if (s.exists()) await updateDoc(membersRef, { allowed: arrayUnion(em) });
-      else await setDoc(membersRef, { allowed: [ownerEmail, em] });
-      mInput.value = ""; mMsg.textContent = "已加入 " + em;
-      renderMembers();
-    }catch(e){ mMsg.textContent = "加入失敗，請確認你有權限。"; }
+      const data = await loadMemberDoc();
+      let allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      if (newEmail !== oldEmail && allowed.includes(newEmail)){
+        mMsg.textContent = "這個信箱已經在成員清單內。";
+        return;
+      }
+      allowed = allowed.map(e => e === oldEmail ? newEmail : e);
+      if (!allowed.includes(newEmail)) allowed.push(newEmail);
+      const names = Object.assign({}, data.names || {});
+      if (newEmail !== oldEmail) delete names[oldEmail];
+      names[newEmail] = newName;
+      const groups = Object.assign({}, data.groups || {});
+      if (newEmail !== oldEmail) delete groups[oldEmail];
+      const myGroup = (mMyGroupInput ? mMyGroupInput.value.trim() : "");
+      if (myGroup) groups[newEmail] = myGroup; else delete groups[newEmail];
+      await setDoc(membersRef, { allowed: allowed, names: names, groups: groups }, { merge: true });
+      currentName = newName;
+      if (newEmail !== oldEmail){
+        mMsg.textContent = "信箱已更新，請用新信箱重新登入。";
+        setTimeout(function(){ signOut(auth); }, 900);
+      }else{
+        mMsg.textContent = "我的基本資料已更新。";
+        setMyMemberCard();
+        renderMembers();
+      }
+    }catch(e){
+      mMsg.textContent = "儲存失敗，請確認你有權限。";
+    }
   };
-  mInput.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmAdd").click(); });
+
+  document.getElementById("mmAdd").onclick = async function(){
+    const nm = mNameInput.value.trim();
+    const em = cleanEmail(mInput.value);
+    if (!nm){ mMsg.textContent = "請先輸入名字。"; return; }
+    if (!emailOk(em)){ mMsg.textContent = "信箱格式怪怪的，再確認一下。"; return; }
+    mMsg.textContent = "新增中…";
+    try{
+      const data = await loadMemberDoc();
+      const allowed = (data.allowed || []).map(cleanEmail).filter(Boolean);
+      if (ownerEmail && !allowed.includes(ownerEmail)) allowed.unshift(ownerEmail);
+      if (!allowed.includes(em)) allowed.push(em);
+      const names = Object.assign({}, data.names || {});
+      if (ownerEmail && !names[ownerEmail]) names[ownerEmail] = currentName || nameFromEmail(ownerEmail);
+      names[em] = nm;
+      await setDoc(membersRef, { allowed: allowed, names: names }, { merge: true });
+      mNameInput.value = "";
+      mInput.value = "";
+      mMsg.textContent = "已新增 " + nm;
+      renderMembers();
+    }catch(e){ mMsg.textContent = "新增失敗，請確認你有權限。"; }
+  };
+  [mNameInput, mInput].forEach(function(el){ el.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmAdd").click(); }); });
+  [mMyNameInput, mMyEmailInput].forEach(function(el){ el.addEventListener("keydown", function(e){ if (e.key === "Enter") document.getElementById("mmSaveSelf").click(); }); });
 </script>
