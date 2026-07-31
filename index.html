@@ -354,84 +354,36 @@
     #map{height:340px}
   }
 
-
-  /* --- hamburger nav + drawer --- */
-  .navbar{display:flex;align-items:center;gap:12px;margin:26px auto 22px;max-width:560px}
-  .burger{width:44px;height:44px;flex-shrink:0;border:1.5px solid var(--kraft-deep);background:var(--paper-2);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;box-shadow:var(--shadow)}
-  .burger span{width:18px;height:2px;background:var(--ink);border-radius:2px}
-  .navbar-title{font-family:var(--hand);font-weight:700;font-size:22px;color:var(--ink)}
-  .scrim{position:fixed;inset:0;background:var(--overlay);opacity:0;visibility:hidden;transition:.25s;z-index:4000}
-  .scrim.open{opacity:1;visibility:visible}
-  .drawer{position:fixed;top:0;left:0;bottom:0;width:260px;max-width:82vw;background:var(--paper-2);border-right:1px solid var(--kraft-deep);transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:4100;display:flex;flex-direction:column;padding:22px 14px;overflow:auto;box-shadow:0 0 44px rgba(0,0,0,.14)}
-  .drawer.open{transform:none}
-  .drawer-head{padding:6px 8px 16px;border-bottom:1px solid var(--line-soft);margin-bottom:10px}
-  .drawer-head .dt{font-family:var(--hand);font-weight:700;font-size:24px;color:var(--ink)}
-  .drawer-head .ds{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
-  .navi{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-family:var(--body);font-weight:500;font-size:15px;color:var(--ink-soft);text-align:left}
-  .navi .ic{width:22px;text-align:center;font-size:17px}
-  .navi:hover{background:var(--kraft)}
-  .navi.active{background:var(--accent-tint);color:var(--terra-deep);font-weight:700}
-  .navi.out{color:var(--ink-soft);margin-top:6px}
-  .drawer-sep{height:1px;background:var(--line-soft);margin:8px 6px}
-  .navi #trashBadge:not(:empty){margin-left:6px;background:var(--rose);color:var(--on-accent);border-radius:10px;padding:0 6px;font-size:11px;font-family:var(--mono)}
-  /* --- boarding-pass hero --- */
-  .hero-card.pass{display:flex;align-items:stretch;gap:0;padding:0;overflow:hidden;text-align:left;position:relative}
-  .pass .pass-main{flex:1;padding:18px 20px;min-width:0}
-  .pass .hn-label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);margin-bottom:6px}
-  .pass .hn-name{font-family:var(--hand);font-size:24px;font-weight:700;color:var(--ink);line-height:1.15}
-  .pass .pass-fly{display:flex;align-items:center;gap:6px;color:var(--terra);font-size:12px;margin:9px 0}
-  .pass .pass-fly i{flex:1;border-top:1.5px dotted var(--ink-soft);opacity:.7}
-  .pass .hn-date{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.02em;line-height:1.5}
-  .pass .pass-stub{width:104px;flex-shrink:0;border-left:2px dashed var(--kraft-deep);background:var(--accent-tint);padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .pass .stub-num{font-family:var(--hand);font-weight:700;font-size:40px;line-height:1;color:var(--terra)}
-  .pass .stub-lab{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px}
-  .pass .stub-seal{font-size:17px;margin-top:8px}
-  .pass .pass-notch{position:absolute;right:96px;width:16px;height:16px;border-radius:50%;background:var(--paper);border:1.5px solid var(--kraft-deep)}
-  .pass .pass-notch.pn-t{top:-8px}
-  .pass .pass-notch.pn-b{bottom:-8px}
-  @media(max-width:400px){ .pass .pass-stub{width:88px} .pass .pass-notch{right:80px} }
 </style>
-
-<div class="scrim" id="navScrim"></div>
-<aside class="drawer" id="navDrawer">
-  <div class="drawer-head"><div class="dt">Our Journey</div><div class="ds">旅程 · 選單</div></div>
-  <button class="navi active" data-tab="itinerary"><span class="ic">🧭</span>行程</button>
-  <button class="navi" data-tab="timeline"><span class="ic">📷</span>旅行回顧</button>
-  <button class="navi" data-tab="map"><span class="ic">🗺️</span>足跡地圖</button>
-  <button class="navi" data-tab="wish"><span class="ic">⭐</span>想去清單</button>
-  <div class="drawer-sep"></div>
-  <button class="navi" id="naviMembers"><span class="ic">👥</span>成員管理</button>
-  <button class="navi" id="naviTrash"><span class="ic">🗑️</span>回收桶<span id="trashBadge"></span></button>
-  <button class="navi out" id="naviLogout"><span class="ic">↩</span>登出</button>
-</aside>
 
 <header>
   <div class="eyebrow">Our Journey · 我們的旅行足跡</div>
   <div class="title" id="coupleTitle" contenteditable="true" spellcheck="false">Our Journey</div>
 
-  <div class="hero-card pass">
-    <div class="pass-main">
-      <span class="hn-label">下一趟旅行 · Next departure</span>
+  <div class="hero-card">
+    <div class="hero-since">
+      <span class="hs-tag">Our Journey ・ 旅程</span>
+      <span class="hs-sub">走過的每一個地方，都值得記得 🌏</span>
+    </div>
+    <div class="hero-path" id="heroPath"></div>
+    <div class="hero-next">
+      <span class="hn-label">下一趟旅行</span>
       <span class="hn-name" id="nextTripName">還沒安排 ✈️</span>
-      <span class="pass-fly"><i></i>✈</span>
-      <span class="hn-date" id="nextTripDate">在「行程」幫某天填上日期，這裡就會自動倒數</span>
+      <span class="hn-count" id="nextTripCount"></span>
+      <span class="hn-date" id="nextTripDate"></span>
     </div>
-    <div class="pass-stub">
-      <span class="stub-num" id="nextTripBig">–</span>
-      <span class="stub-lab" id="nextTripBigLab">days</span>
-      <span class="stub-seal">🛂</span>
-    </div>
-    <span class="pass-notch pn-t"></span>
-    <span class="pass-notch pn-b"></span>
   </div>
 
+  <div class="tiles" id="homeTiles"></div>
 </header>
 
 <div class="wrap">
-  <div class="navbar">
-    <button class="burger" id="burger" aria-label="選單"><span></span><span></span><span></span></button>
-    <span class="navbar-title" id="navTitle">行程</span>
-  </div>
+  <nav>
+    <button class="tab active" data-tab="itinerary">✈️ 行程</button>
+    <button class="tab" data-tab="timeline">📖 旅行回顧</button>
+    <button class="tab" data-tab="map">🗺️ 足跡地圖</button>
+    <button class="tab" data-tab="wish">⭐ 想去清單</button>
+  </nav>
 
   <section class="panel active" id="itinerary"></section>
   <section class="panel" id="timeline"></section>
@@ -442,7 +394,13 @@
   </section>
   <section class="panel" id="wish"></section>
 
-  <div class="foot">Our Journey ・ 把每一趟旅行，都收進這裡 <span style="color:var(--rose)">✈️</span></div>
+  <div class="foot">Our Journey ・ 把每一趟旅行，都收進這裡 <span style="color:var(--rose)">✈️</span>
+    <div class="foot-links">
+      <button id="trashBtn" class="foot-link" onclick="window.__openTrash&&window.__openTrash()">🗑 回收桶<span id="trashBadge"></span></button>
+      <button id="membersBtn" class="foot-link" onclick="window.__openMembers&&window.__openMembers()">👤 成員</button>
+      <button id="logoutBtn" class="foot-link" onclick="window.fbAuth&&window.fbAuth.signOut()">登出</button>
+    </div>
+  </div>
 </div>
 
 <button class="fab" id="fab" style="display:none">＋ 新增回憶</button>
@@ -801,14 +759,11 @@
     if(best && nn){
       var diff = Math.round((bestDate - today)/86400000);
       nn.textContent = (best.emoji?best.emoji+" ":"") + (best.name || "未命名旅程");
-      var big=$("nextTripBig"), biglab=$("nextTripBigLab");
-      if(big) big.textContent = diff===0 ? "今天" : diff;
-      if(biglab) biglab.textContent = diff===0 ? "出發" : "天後";
+      if(nc) nc.innerHTML = diff===0 ? "就是今天 🎉" : ('還有 <b>'+diff+'</b> 天');
       nd.textContent = fmtDate(bestDate.toISOString().slice(0,10)) + " 出發";
     } else if(nn){
       nn.textContent = "還沒安排 ✈️";
-      var big2=$("nextTripBig"), bl2=$("nextTripBigLab");
-      if(big2) big2.textContent = "–"; if(bl2) bl2.textContent = "days";
+      if(nc) nc.textContent = "";
       nd.textContent = "在「行程」幫某天填上日期，這裡就會自動倒數";
     }
 
@@ -1605,27 +1560,17 @@
     $(o).addEventListener("click",function(ev){ if(ev.target===$(o)) $(o).classList.remove("show"); });
   });
 
-  function activateTab(id){
-    document.querySelectorAll(".navi[data-tab]").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-tab")===id); });
-    document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
-    $(id==="map"?"map-panel":id).classList.add("active");
-    var lbl={itinerary:"行程",timeline:"旅行回顧",map:"足跡地圖",wish:"想去清單"}[id];
-    var nt=$("navTitle"); if(nt&&lbl) nt.textContent=lbl;
-    if(id==="map"){ initMainMap(); setTimeout(function(){ if(mapMain){ google.maps.event.trigger(mapMain,"resize"); refreshMap(); } },180); }
-    if(id==="wish"){ setTimeout(function(){ refreshWishMap(); },180); }
-  }
-  document.querySelectorAll(".navi[data-tab]").forEach(function(t){
-    t.addEventListener("click",function(){ activateTab(t.getAttribute("data-tab")); closeDrawer(); });
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
+      document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var id=t.getAttribute("data-tab");
+      $(id==="map"?"map-panel":id).classList.add("active");
+      if(id==="map"){ initMainMap(); setTimeout(function(){ if(mapMain){ google.maps.event.trigger(mapMain,"resize"); refreshMap(); } },180); }
+      if(id==="wish"){ setTimeout(function(){ refreshWishMap(); },180); }
+    });
   });
-  function openDrawer(){ var d=$("navDrawer"),sc=$("navScrim"); if(d)d.classList.add("open"); if(sc)sc.classList.add("open"); }
-  function closeDrawer(){ var d=$("navDrawer"),sc=$("navScrim"); if(d)d.classList.remove("open"); if(sc)sc.classList.remove("open"); }
-  (function(){
-    var b=$("burger"); if(b)b.addEventListener("click",openDrawer);
-    var sc=$("navScrim"); if(sc)sc.addEventListener("click",closeDrawer);
-    var m=$("naviMembers"); if(m)m.addEventListener("click",function(){ closeDrawer(); window.__openMembers&&window.__openMembers(); });
-    var tr=$("naviTrash"); if(tr)tr.addEventListener("click",function(){ closeDrawer(); window.__openTrash&&window.__openTrash(); });
-    var lo=$("naviLogout"); if(lo)lo.addEventListener("click",function(){ window.fbAuth&&window.fbAuth.signOut(); });
-  })();
 
   /* ---------- memory modal ---------- */
   var photoData=null;
@@ -1896,6 +1841,8 @@
 
   const gate = document.getElementById("loginGate");
   const gateMsg = document.getElementById("gateMsg");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const membersBtn = document.getElementById("membersBtn");
   let currentEmail = "";
 
   async function loadAllowed(){
@@ -1911,7 +1858,7 @@
   };
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user){ gate.style.display = "flex"; return; }
+    if (!user){ gate.style.display = "flex"; logoutBtn.style.display = "none"; membersBtn.style.display = "none"; return; }
     currentEmail = (user.email || "").toLowerCase();
     const isOwner = currentEmail === ownerEmail;
     let allowed = await loadAllowed();
@@ -1928,9 +1875,13 @@
 
     if (isOwner || allowed.includes(currentEmail)){
       gate.style.display = "none";
+      logoutBtn.style.display = "block";
+      membersBtn.style.display = "";
       window.__startApp && window.__startApp();
     } else {
       gateMsg.textContent = "這個帳號還沒被邀請，請聯絡家人把你加進成員。";
+      logoutBtn.style.display = "none";
+      membersBtn.style.display = "none";
       signOut(auth);
     }
   });
